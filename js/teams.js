@@ -36,7 +36,7 @@ class TeamsPage {
     }
 
     async loadPhaseData(phase) {
-        const phasePath = `/data/${phase}/`;
+        const phasePath = `data/${phase}/`;
         const fileNames = this.getFileNamesForPhase(phase);
         
         for (const fileName of fileNames) {
@@ -979,4 +979,5 @@ class TeamsPage {
 // Initialize teams page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new TeamsPage();
+
 });
