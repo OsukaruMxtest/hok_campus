@@ -33,7 +33,7 @@ class BracketsPage {
     }
 
     async loadPhaseData(phase) {
-        const phasePath = `/data/${phase}/`;
+        const phasePath = `data/${phase}/`;
         const fileNames = this.getFileNamesForPhase(phase);
         
         for (const fileName of fileNames) {
@@ -482,4 +482,5 @@ class BracketsPage {
 // Initialize brackets page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new BracketsPage();
+
 });
