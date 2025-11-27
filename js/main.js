@@ -52,7 +52,7 @@ class HonorOfKingsDashboard {
     }
     // Load data for a specific phase
     async loadPhaseData(phase) {
-        const phasePath = `/data/${phase}/`;
+        const phasePath = `data/${phase}/`;
         try {
             const fileNames = await this.getCSVFileNames(phase);
             for (const fileName of fileNames) {
@@ -1715,4 +1715,5 @@ window.addEventListener('error', (e) => {
     if (e.target.tagName === 'IMG' && e.target.src.includes('/assets/logos/')) {
         e.target.src = '/assets/logos/default_logo.png';
     }
+
 }, true);
