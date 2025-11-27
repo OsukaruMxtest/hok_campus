@@ -35,7 +35,7 @@ class StatsPage {
     }
 
     async loadPhaseData(phase) {
-        const phasePath = `/data/${phase}/`;
+        const phasePath = `data/${phase}/`;
         const fileNames = this.getFileNamesForPhase(phase);
         
         for (const fileName of fileNames) {
@@ -774,4 +774,5 @@ class StatsPage {
 // Initialize stats page when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new StatsPage();
+
 });
