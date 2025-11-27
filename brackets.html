@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brackets del Torneo - Honor of Kings Campus Series LATAM NORTE 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="main-nav" id="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
+                <span>Honor of Kings LATAM NORTE 2025</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Dashboard Principal</a></li>
+                <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
+                <li><a href="stats.html" class="nav-link">Estadísticas Detalladas</a></li>
+                <li><a href="brackets.html" class="nav-link active">Brackets del Torneo</a></li>
+            </ul>
+            <button class="nav-toggle" id="nav-toggle">☰</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Brackets del Torneo</h1>
+            </div>
+            <div class="header-right">
+                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
+                <div class="bracket-controls">
+                    <button id="zoom-in" class="btn-secondary">+</button>
+                    <button id="zoom-out" class="btn-secondary">-</button>
+                    <button id="reset-view" class="btn-secondary">Reset</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <div class="content-area full-width">
+                <div class="content-header">
+                    <div class="breadcrumb">
+                        <span>Brackets del Torneo</span>
+                    </div>
+                    <div class="bracket-phase-selector">
+                        <button class="phase-btn active" data-phase="all">Todos</button>
+                        <button class="phase-btn" data-phase="cuartos">Cuartos</button>
+                        <button class="phase-btn" data-phase="semifinal">Semifinal</button>
+                        <button class="phase-btn" data-phase="final">Final</button>
+                    </div>
+                </div>
+
+                <!-- Bracket Visualization -->
+                <div class="bracket-visualization-container">
+                    <div class="bracket-visualization" id="bracket-visualization">
+                        <!-- Bracket will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Match Details -->
+                <div class="match-details-panel" id="match-details-panel">
+                    <div class="match-details-header">
+                        <h3>Detalles del Partido</h3>
+                        <button id="close-match-details" class="btn-close">×</button>
+                    </div>
+                    <div class="match-details-content" id="match-details-content">
+                        <!-- Match details will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Presentation Mode Overlay -->
+    <div class="presentation-overlay" id="presentation-overlay">
+        <div class="presentation-content">
+            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
+            <h1 class="presentation-title">Brackets del Torneo</h1>
+            <div class="presentation-bracket" id="presentation-bracket">
+                <!-- Bracket will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/brackets.js"></script>
+</body>
+</html>

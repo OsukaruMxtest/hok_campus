@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas Detalladas - Honor of Kings Campus Series LATAM NORTE 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="main-nav" id="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
+                <span>Honor of Kings LATAM NORTE 2025</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Dashboard Principal</a></li>
+                <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
+                <li><a href="stats.html" class="nav-link active">Estadísticas Detalladas</a></li>
+                <li><a href="brackets.html" class="nav-link">Brackets del Torneo</a></li>
+            </ul>
+            <button class="nav-toggle" id="nav-toggle">☰</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Estadísticas Detalladas</h1>
+            </div>
+            <div class="header-right">
+                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
+                <div class="stats-filters">
+                    <select id="stats-phase-filter">
+                        <option value="all">Todas las fases</option>
+                        <option value="cuartos">Cuartos de Final</option>
+                        <option value="semifinal">Semifinal</option>
+                        <option value="final">Final</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <div class="content-area">
+                <div class="content-header">
+                    <div class="breadcrumb">
+                        <span>Estadísticas Detalladas</span>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-category">
+                        <h2>Estadísticas de Equipos</h2>
+                        <div class="stats-table-container">
+                            <table class="stats-table" id="team-stats-table">
+                                <thead>
+                                    <tr>
+                                        <th>Equipo</th>
+                                        <th>Partidos</th>
+                                        <th>Victorias</th>
+                                        <th>KDA</th>
+                                        <th>Daño Promedio</th>
+                                        <th>Oro Promedio</th>
+                                        <th>Participación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Team stats will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="stat-category">
+                        <h2>Estadísticas de Jugadores</h2>
+                        <div class="stats-table-container">
+                            <table class="stats-table" id="player-stats-table">
+                                <thead>
+                                    <tr>
+                                        <th>Jugador</th>
+                                        <th>Equipo</th>
+                                        <th>KDA</th>
+                                        <th>Eliminaciones</th>
+                                        <th>Muertes</th>
+                                        <th>Asistencias</th>
+                                        <th>Daño Promedio</th>
+                                        <th>Oro Promedio</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Player stats will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Charts -->
+                <div class="advanced-charts">
+                    <div class="chart-row">
+                        <div class="chart-container large">
+                            <h3>Distribución de KDA por Equipo</h3>
+                            <canvas id="kda-chart"></canvas>
+                        </div>
+                        <div class="chart-container large">
+                            <h3>Evolución de Rendimiento por Fase</h3>
+                            <canvas id="performance-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-row">
+                        <div class="chart-container large">
+                            <h3>Comparativa de Daño entre Equipos</h3>
+                            <canvas id="damage-comparison-chart"></canvas>
+                        </div>
+                        <div class="chart-container large">
+                            <h3>Eficiencia de Oro por Equipo</h3>
+                            <canvas id="gold-efficiency-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Presentation Mode Overlay -->
+    <div class="presentation-overlay" id="presentation-overlay">
+        <div class="presentation-content">
+            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
+            <h1 class="presentation-title">Estadísticas Detalladas</h1>
+            <div class="presentation-stats-tables" id="presentation-stats-tables">
+                <!-- Stats tables will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/stats.js"></script>
+</body>
+</html>

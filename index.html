@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Principal - Honor of Kings Campus Series LATAM NORTE 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="main-nav" id="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
+                <span>Honor of Kings LATAM NORTE 2025</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link active">Dashboard Principal</a></li>
+                <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
+                <li><a href="stats.html" class="nav-link">Estadísticas Detalladas</a></li>
+                <li><a href="brackets.html" class="nav-link">Brackets del Torneo</a></li>
+				<li><a href="featured_players.html" class="nav-link">Jugadores Destacados</a></li>
+            </ul>
+            <button class="nav-toggle" id="nav-toggle">☰</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Dashboard Honor of Kings Campus Series LATAM NORTE 2025</h1>
+            </div>
+            <div class="header-right">
+                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
+                <button id="toggle-filters" class="btn-filters">Mostrar Filtros</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Sidebar with Bracket -->
+            <aside class="sidebar" id="sidebar">
+                <div class="bracket-container">
+                    <h2>Fase Actual</h2>
+                    <div class="phase-selector">
+                        <select id="phase-select">
+                            <option value="cuartos">Cuartos de Final</option>
+                            <option value="semifinal">Semifinal</option>
+                            <option value="final">Final</option>
+                        </select>
+                    </div>
+                    <div class="bracket" id="bracket">
+                        <!-- Bracket will be generated here -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Filters Panel -->
+            <div class="filters-panel" id="filters-panel">
+                <div class="filters-header">
+                    <h2>Filtros</h2>
+                    <button id="close-filters" class="btn-close">×</button>
+                </div>
+                <div class="filters-content">
+                    <div class="filter-group">
+                        <label for="bracket-select">Llave</label>
+                        <select id="bracket-select">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="team-select">Equipo</label>
+                        <select id="team-select">
+                            <option value="all">Todos los equipos</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="player-select">Jugador</label>
+                        <select id="player-select">
+                            <option value="all">Todos los jugadores</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button id="apply-filters" class="btn-primary">Aplicar Filtros</button>
+                        <button id="reset-filters" class="btn-secondary">Restablecer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="content-area">
+                <div class="content-header">
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span>Inicio</span>
+                    </div>
+                    <div class="view-controls">
+                        <button id="toggle-sidebar" class="btn-toggle">Mostrar Bracket</button>
+                    </div>
+                </div>
+
+                <!-- Featured Players by Phase -->
+                <div class="featured-players-section">
+                    <h2>Jugadores Destacados por Fase</h2>
+                    <div class="featured-players-container" id="featured-players-container">
+                        <!-- Featured players by phase will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-section">
+                    <h2>Estadísticas del Torneo</h2>
+                    <div class="stats-cards" id="stats-cards">
+                        <!-- Statistics cards will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3>Comparativa de Equipos</h3>
+                        <canvas id="radar-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Rendimiento de Jugadores (Top 10)</h3>
+                        <canvas id="bar-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Distribución de Participación</h3>
+                        <canvas id="pie-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Teams and Players Section -->
+                <div class="teams-section">
+                    <h2>Equipos y Jugadores</h2>
+                    <div class="teams-container" id="teams-container">
+                        <!-- Teams and players will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Presentation Mode Overlay -->
+    <div class="presentation-overlay" id="presentation-overlay">
+        <div class="presentation-content">
+            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
+            <h1 class="presentation-title">Honor of Kings Campus Series LATAM NORTE 2025</h1>
+            <div class="presentation-stats" id="presentation-stats">
+                <!-- Featured stats will be displayed here -->
+            </div>
+            <div class="best-team-presentation" id="best-team-presentation">
+                <!-- Best team will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Teams and Players Detail Panel -->
+    <div class="detail-panel" id="detail-panel">
+        <div class="detail-header">
+            <h2 id="detail-title">Detalles</h2>
+            <button id="close-detail" class="btn-close">×</button>
+        </div>
+        <div class="detail-content" id="detail-content">
+            <!-- Detail content will be loaded here -->
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

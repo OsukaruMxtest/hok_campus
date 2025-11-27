@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jugadores Destacados - Honor of Kings Campus Series LATAM NORTE 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="main-nav" id="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
+                <span>Honor of Kings LATAM NORTE 2025</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Dashboard Principal</a></li>
+                <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
+                <li><a href="stats.html" class="nav-link">Estadísticas Detalladas</a></li>
+                <li><a href="brackets.html" class="nav-link">Brackets del Torneo</a></li>
+                <li><a href="featured_players.html" class="nav-link active">Jugadores Destacados</a></li>
+            </ul>
+            <button class="nav-toggle" id="nav-toggle">☰</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Jugadores Destacados por Fase - Honor of Kings Campus Series LATAM NORTE 2025</h1>
+            </div>
+            <div class="header-right">
+                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <div class="content-area">
+                <div class="content-header">
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span>Inicio > Jugadores Destacados</span>
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loading-indicator" class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando datos de jugadores...</p>
+                </div>
+
+                <!-- Featured Players by Phase -->
+                <div class="featured-players-page">
+                    <!-- Cuartos de Final -->
+                    <section class="phase-section" id="cuartos-section">
+                        <h2 class="phase-title">🏆 Cuartos de Final - Top 10 Jugadores</h2>
+                        <div class="featured-players-grid" id="cuartos-players">
+                            <!-- Jugadores de cuartos se cargarán aquí -->
+                        </div>
+                    </section>
+
+                    <!-- Semifinal -->
+                    <section class="phase-section" id="semifinal-section">
+                        <h2 class="phase-title">🥈 Semifinal - Top 10 Jugadores</h2>
+                        <div class="featured-players-grid" id="semifinal-players">
+                            <!-- Jugadores de semifinal se cargarán aquí -->
+                        </div>
+                    </section>
+
+                    <!-- Final -->
+                    <section class="phase-section" id="final-section">
+                        <h2 class="phase-title">👑 Final - Top 10 Jugadores</h2>
+                        <div class="featured-players-grid" id="final-players">
+                            <!-- Jugadores de final se cargarán aquí -->
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Statistics Summary -->
+                <div class="stats-summary glass fade-in">
+                    <h3>Resumen Estadístico</h3>
+                    <div class="stats-summary-grid" id="stats-summary">
+                        <!-- Resumen se cargará aquí -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Presentation Mode Overlay -->
+    <div class="presentation-overlay" id="presentation-overlay">
+        <div class="presentation-content">
+            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
+            <h1 class="presentation-title">Jugadores Destacados por Fase<br>Honor of Kings Campus Series LATAM NORTE 2025</h1>
+            <div class="presentation-featured-players" id="presentation-featured-players">
+                <!-- Jugadores destacados en presentación -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/featured_players.js"></script>
+</body>
+</html>
