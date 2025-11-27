@@ -82,7 +82,7 @@ class FeaturedPlayersDashboard {
 
     // Load data for a specific phase
     async loadPhaseData(phase) {
-        const phasePath = `/data/${phase}/`;
+        const phasePath = `data/${phase}/`;
         
         try {
             const fileNames = await this.getCSVFileNames(phase);
@@ -483,4 +483,5 @@ window.addEventListener('error', (e) => {
     if (e.target.tagName === 'IMG' && e.target.src.includes('/assets/players/')) {
         e.target.src = '/assets/logos/default_logo.png';
     }
+
 }, true);
