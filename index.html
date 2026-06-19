@@ -2,177 +2,496 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Principal - Honor of Kings Campus Series LATAM NORTE 2025</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dashboard Principal - Honor of Kings: Ultra Chaos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Estilos adicionales para asegurar que los elementos no se desborden -->
+    <style>
+        /* ===== JUGADORES DESTACADOS — TARJETAS MEJORADAS ===== */
+        #featured-players-container {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            width: 100%;
+            overflow: visible;
+        }
+
+        #featured-players-container .featured-phase-player {
+            position: relative;
+            display: grid;
+            grid-template-columns: 76px minmax(0, 1fr);
+            align-items: center;
+            gap: 1rem;
+            min-width: 0;
+            min-height: 150px;
+            padding: 1rem;
+            overflow: hidden;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(74, 60, 46, 0.92),
+                    rgba(31, 26, 21, 0.94)
+                );
+
+            border: 1px solid rgba(218, 194, 151, 0.24);
+            border-radius: 16px;
+            box-shadow:
+                0 8px 24px rgba(0, 0, 0, 0.32),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+            transition:
+                transform 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        #featured-players-container .featured-phase-player::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 3px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--primary-yellow),
+                var(--primary-pink),
+                transparent
+            );
+            opacity: 0.9;
+        }
+
+        #featured-players-container .featured-phase-player::after {
+            content: "";
+            position: absolute;
+            top: -45px;
+            right: -45px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle,
+                rgba(217, 173, 91, 0.15),
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        #featured-players-container .featured-phase-player:hover {
+            transform: translateY(-4px);
+            border-color: rgba(217, 173, 91, 0.55);
+            box-shadow:
+                0 14px 32px rgba(0, 0, 0, 0.42),
+                0 0 20px rgba(217, 173, 91, 0.08);
+        }
+
+        #featured-players-container .featured-phase-player-image {
+            position: relative;
+            z-index: 1;
+            width: 76px;
+            height: 76px;
+            min-width: 76px;
+            min-height: 76px;
+            max-width: 76px;
+            max-height: 76px;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 50%;
+
+            border: 3px solid var(--primary-yellow);
+            outline: 3px solid rgba(217, 173, 91, 0.14);
+
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.08),
+                0 8px 18px rgba(0, 0, 0, 0.36),
+                0 0 18px rgba(217, 173, 91, 0.15);
+        }
+
+        #featured-players-container .featured-phase-player-info {
+            position: relative;
+            z-index: 1;
+            min-width: 0;
+            width: 100%;
+        }
+
+        #featured-players-container .featured-phase-player-name {
+            margin: 0 0 0.2rem;
+            overflow: hidden;
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #featured-players-container .featured-phase-player-phase,
+        #featured-players-container .featured-phase-player-team {
+            display: inline-flex;
+            align-items: center;
+            max-width: 100%;
+            margin-bottom: 0.65rem;
+            padding: 0.18rem 0.55rem;
+
+            overflow: hidden;
+            color: var(--primary-lilac);
+            background: rgba(217, 173, 91, 0.09);
+            border: 1px solid rgba(217, 173, 91, 0.16);
+            border-radius: 999px;
+
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #featured-players-container .featured-phase-player-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.4rem;
+            width: 100%;
+        }
+
+        #featured-players-container .featured-phase-stat {
+            min-width: 0;
+            padding: 0.38rem 0.3rem;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #featured-players-container .featured-phase-stat-value {
+            display: block;
+            overflow: hidden;
+            color: var(--primary-yellow);
+            font-size: 0.88rem;
+            font-weight: 700;
+            line-height: 1.15;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #featured-players-container .featured-phase-stat-label {
+            display: block;
+            margin-top: 0.12rem;
+            overflow: hidden;
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 0.58rem;
+            line-height: 1.15;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Evitar que reglas genéricas rompan la tarjeta */
+        #featured-players-container .featured-phase-player,
+        #featured-players-container .featured-phase-player * {
+            box-sizing: border-box;
+        }
+
+        #featured-players-container .featured-phase-player-name,
+        #featured-players-container .featured-phase-player-info {
+            word-break: normal;
+            overflow-wrap: normal;
+            hyphens: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            #featured-players-container {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            #featured-players-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 420px) {
+            #featured-players-container .featured-phase-player {
+                grid-template-columns: 64px minmax(0, 1fr);
+                padding: 0.85rem;
+            }
+
+            #featured-players-container .featured-phase-player-image {
+                width: 64px;
+                height: 64px;
+                min-width: 64px;
+                min-height: 64px;
+                max-width: 64px;
+                max-height: 64px;
+            }
+        }
+
+        /* ===== FIN JUGADORES DESTACADOS ===== */
+
+        /* Aseguramos que el panel de detalle y filtros no se desborden con textos largos */
+        .detail-content,
+        .filters-content {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        .detail-content img,
+        .filters-content img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation Menu -->
-    <nav class="main-nav" id="main-nav">
+
+    <!-- ================= MENÚ PRINCIPAL ================= -->
+    <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
         <div class="nav-container">
             <div class="nav-logo">
                 <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
-                <span>Honor of Kings LATAM NORTE 2025</span>
+                <span>Honor of Kings: Ultra Chaos</span>
             </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link active">Dashboard Principal</a></li>
+            <ul class="nav-menu" id="nav-menu" role="list">
+                <li><a href="index.html" class="nav-link active" aria-current="page">Dashboard Principal</a></li>
                 <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
                 <li><a href="stats.html" class="nav-link">Estadísticas Detalladas</a></li>
-                <li><a href="brackets.html" class="nav-link">Brackets del Torneo</a></li>
-				<li><a href="featured_players.html" class="nav-link">Jugadores Destacados</a></li>
+                <li><a href="brackets.html" class="nav-link">Llaves del Torneo</a></li>
+                <li><a href="featured_players.html" class="nav-link">Jugadores Destacados</a></li>
             </ul>
-            <button class="nav-toggle" id="nav-toggle">☰</button>
+            <button class="nav-toggle" id="nav-toggle" aria-label="Alternar menú de navegación" aria-expanded="false" aria-controls="nav-menu">☰</button>
         </div>
     </nav>
 
+    <!-- ================= DASHBOARD PRINCIPAL ================= -->
     <div class="dashboard-container">
-        <!-- Header -->
-        <header class="dashboard-header">
+
+        <!-- ======== HERO / HEADER COMPACTO ======== -->
+        <header class="dashboard-header" aria-label="Cabecera del dashboard">
             <div class="header-left">
-                <h1>Dashboard Honor of Kings Campus Series LATAM NORTE 2025</h1>
+                <h1>Honor of Kings: Ultra Chaos</h1>
+                <div class="header-phase">
+                    <span class="phase-label">Fase actual:</span>
+                    <span class="phase-value" id="current-phase-display">Clasificatorias Día 1</span>
+                </div>
             </div>
             <div class="header-right">
-                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
-                <button id="toggle-filters" class="btn-filters">Mostrar Filtros</button>
+                <button id="presentation-mode-toggle" class="btn-presentation" type="button" aria-label="Activar modo presentación">Modo Presentación</button>
+                <button id="toggle-filters" class="btn-filters" type="button" aria-label="Mostrar filtros" aria-expanded="false" aria-controls="filters-panel">Mostrar Filtros</button>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="dashboard-main">
-            <!-- Sidebar with Bracket -->
-            <aside class="sidebar" id="sidebar">
+        <!-- ======== CUERPO PRINCIPAL ======== -->
+        <main class="dashboard-main" aria-label="Contenido principal del dashboard">
+
+            <!-- ===== SIDEBAR con BRACKET ===== -->
+            <aside class="sidebar" id="sidebar" aria-label="Llave del torneo">
                 <div class="bracket-container">
-                    <h2>Fase Actual</h2>
+                    <h2>Llave del Torneo</h2>
                     <div class="phase-selector">
+                        <label for="phase-select" class="visually-hidden">Seleccionar fase</label>
                         <select id="phase-select">
-                            <option value="cuartos">Cuartos de Final</option>
-                            <option value="semifinal">Semifinal</option>
+                            <option value="cuartos">Clasificatorias Día 1</option>
+                            <option value="semifinal">Semifinales</option>
                             <option value="final">Final</option>
                         </select>
                     </div>
-                    <div class="bracket" id="bracket">
-                        <!-- Bracket will be generated here -->
+                    <div class="bracket" id="bracket" role="list" aria-label="Partidos de la llave">
+                        <!-- bracket dinámico -->
                     </div>
                 </div>
             </aside>
 
-            <!-- Filters Panel -->
-            <div class="filters-panel" id="filters-panel">
-                <div class="filters-header">
-                    <h2>Filtros</h2>
-                    <button id="close-filters" class="btn-close">×</button>
-                </div>
-                <div class="filters-content">
-                    <div class="filter-group">
-                        <label for="bracket-select">Llave</label>
-                        <select id="bracket-select">
-                            <!-- Options will be populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="team-select">Equipo</label>
-                        <select id="team-select">
-                            <option value="all">Todos los equipos</option>
-                            <!-- Options will be populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="player-select">Jugador</label>
-                        <select id="player-select">
-                            <option value="all">Todos los jugadores</option>
-                            <!-- Options will be populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="filter-actions">
-                        <button id="apply-filters" class="btn-primary">Aplicar Filtros</button>
-                        <button id="reset-filters" class="btn-secondary">Restablecer</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content Area -->
+            <!-- ===== CONTENIDO PRINCIPAL ===== -->
             <div class="content-area">
+
+                <!-- Migas de pan / navegación contextual -->
                 <div class="content-header">
-                    <div class="breadcrumb" id="breadcrumb">
+                    <div class="breadcrumb" id="breadcrumb" aria-label="Ruta de navegación">
                         <span>Inicio</span>
                     </div>
                     <div class="view-controls">
-                        <button id="toggle-sidebar" class="btn-toggle">Mostrar Bracket</button>
+                        <button id="toggle-sidebar" class="btn-toggle" type="button" aria-label="Alternar visibilidad de la llave" aria-expanded="true" aria-controls="sidebar">Ocultar Bracket</button>
                     </div>
                 </div>
 
-                <!-- Featured Players by Phase -->
-                <div class="featured-players-section">
-                    <h2>Jugadores Destacados por Fase</h2>
-                    <div class="featured-players-container" id="featured-players-container">
-                        <!-- Featured players by phase will be generated here -->
-                    </div>
-                </div>
-
-                <!-- Statistics Cards -->
-                <div class="stats-section">
-                    <h2>Estadísticas del Torneo</h2>
+                <!-- ===== SECCIÓN: RESUMEN DEL TORNEO ===== -->
+                <section class="stats-section" aria-label="Resumen de estadísticas del torneo">
+                    <h2>Resumen del Torneo</h2>
+                    <p class="section-description">Visión general de las métricas clave del torneo.</p>
                     <div class="stats-cards" id="stats-cards">
-                        <!-- Statistics cards will be generated here -->
+                        <!-- tarjetas dinámicas inyectadas por main.js -->
                     </div>
-                </div>
+                </section>
 
-                <!-- Charts Section -->
-                <div class="charts-section">
-                    <div class="chart-container">
-                        <h3>Comparativa de Equipos</h3>
-                        <canvas id="radar-chart"></canvas>
+                <!-- ===== SECCIÓN: JUGADORES DESTACADOS POR FASE ===== -->
+                <section class="featured-players-section" aria-label="Jugadores destacados por fase">
+                    <h2>Jugadores Destacados por Fase</h2>
+                    <p class="section-description">Los mejores jugadores de cada etapa del torneo, según rendimiento global.</p>
+                    <div class="featured-players-container" id="featured-players-container">
+                        <!-- contenido dinámico inyectado por main.js -->
                     </div>
-                    <div class="chart-container">
-                        <h3>Rendimiento de Jugadores (Top 10)</h3>
-                        <canvas id="bar-chart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3>Distribución de Participación</h3>
-                        <canvas id="pie-chart"></canvas>
-                    </div>
-                </div>
+                </section>
 
-                <!-- Teams and Players Section -->
-                <div class="teams-section">
+                <!-- ===== SECCIÓN: GRÁFICAS ===== -->
+                <section class="charts-section" aria-label="Análisis visual del torneo">
+                    <h2>Análisis Visual del Torneo</h2>
+                    <p class="section-description">Haz clic en cualquier gráfica para ampliarla y ver los detalles con mayor claridad.</p>
+                    <div class="charts-grid">
+
+                        <!-- Gráfica 1: Comparativa de Equipos (Radar) -->
+                        <div class="chart-card is-chart-expandable" data-chart-title="Comparativa de Equipos - Rendimiento por métricas" tabindex="0" role="button" aria-label="Ampliar gráfica: Comparativa de Equipos">
+                            <div class="chart-header">
+                                <h3>Comparativa de Equipos</h3>
+                                <div class="chart-header-actions">
+                                    <span class="chart-icon" aria-hidden="true">📊</span>
+                                    <span class="chart-expand-hint" aria-hidden="true">🔍 Ampliar</span>
+                                </div>
+                            </div>
+                            <div id="radar-team-toggles" class="chart-team-toggles" aria-label="Mostrar u ocultar equipos en la gráfica"></div>
+                            <div class="chart-wrapper">
+                                <canvas id="radar-chart" aria-label="Gráfico de radar comparativo de equipos"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Gráfica 2: Rendimiento de Jugadores (Barra) -->
+                        <div class="chart-card is-chart-expandable" data-chart-title="Rendimiento de Jugadores - Top 10" tabindex="0" role="button" aria-label="Ampliar gráfica: Rendimiento de Jugadores Top 10">
+                            <div class="chart-header">
+                                <h3>Rendimiento de Jugadores (Top 10)</h3>
+                                <div class="chart-header-actions">
+                                    <span class="chart-icon" aria-hidden="true">🏆</span>
+                                    <span class="chart-expand-hint" aria-hidden="true">🔍 Ampliar</span>
+                                </div>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="bar-chart" aria-label="Gráfico de barras del rendimiento de los 10 mejores jugadores"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Gráfica 3: Distribución de Participación (Tarta) -->
+                        <div class="chart-card is-chart-expandable" id="distribution-chart-card" data-chart-title="Distribución de Participación por Equipo" tabindex="0" role="button" aria-label="Ampliar gráfica: Distribución de Participación">
+                            <div class="chart-header">
+                                <h3 id="distribution-chart-title">Distribución de Participación</h3>
+                                <p id="distribution-chart-description" class="chart-description" style="font-size:0.85rem; color:var(--text-light); margin:0.25rem 0 0 0; grid-column:1 / -1;">Participación promedio por equipo</p>
+                                <div class="chart-header-actions">
+                                    <span class="chart-icon" aria-hidden="true">🥧</span>
+                                    <span class="chart-expand-hint" aria-hidden="true">🔍 Ampliar</span>
+                                </div>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="pie-chart" aria-label="Gráfico circular de distribución de participación por equipo"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ===== SECCIÓN: EQUIPOS Y JUGADORES ===== -->
+                <section class="teams-section" aria-label="Equipos y jugadores del torneo">
                     <h2>Equipos y Jugadores</h2>
+                    <p class="section-description">Explora los equipos participantes y sus jugadores. Haz clic en un equipo o jugador para ver más detalles.</p>
                     <div class="teams-container" id="teams-container">
-                        <!-- Teams and players will be displayed here -->
+                        <!-- equipos dinámicos inyectados por main.js -->
                     </div>
-                </div>
-            </div>
-        </main>
-    </div>
+                </section>
 
-    <!-- Presentation Mode Overlay -->
-    <div class="presentation-overlay" id="presentation-overlay">
-        <div class="presentation-content">
-            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
-            <h1 class="presentation-title">Honor of Kings Campus Series LATAM NORTE 2025</h1>
-            <div class="presentation-stats" id="presentation-stats">
-                <!-- Featured stats will be displayed here -->
+            </div> <!-- fin .content-area -->
+        </main>
+
+        <!-- ======== PANEL DE FILTROS (colapsable) ======== -->
+        <div class="filters-panel" id="filters-panel" role="dialog" aria-modal="true" aria-labelledby="filters-title" aria-hidden="true">
+            <div class="filters-header">
+                <h2 id="filters-title">Filtros</h2>
+                <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
             </div>
-            <div class="best-team-presentation" id="best-team-presentation">
-                <!-- Best team will be displayed here -->
+            <div class="filters-content">
+                <div class="filter-group">
+                    <label for="bracket-select">Llave</label>
+                    <select id="bracket-select">
+                        <!-- opciones dinámicas -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="team-select">Equipo</label>
+                    <select id="team-select">
+                        <option value="all">Todos los equipos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="player-select">Jugador</label>
+                    <select id="player-select">
+                        <option value="all">Todos los jugadores</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button id="apply-filters" class="btn-primary" type="button">Aplicar Filtros</button>
+                    <button id="reset-filters" class="btn-secondary" type="button">Restablecer</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Teams and Players Detail Panel -->
-    <div class="detail-panel" id="detail-panel">
+    </div> <!-- fin .dashboard-container -->
+
+    <!-- ================= PANEL DE DETALLE (lateral) ================= -->
+    <div class="detail-panel" id="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-title" aria-hidden="true">
         <div class="detail-header">
             <h2 id="detail-title">Detalles</h2>
-            <button id="close-detail" class="btn-close">×</button>
+            <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
         </div>
         <div class="detail-content" id="detail-content">
-            <!-- Detail content will be loaded here -->
+            <!-- contenido dinámico inyectado por main.js -->
         </div>
     </div>
 
+    <!-- ================= MODAL GLOBAL DE GRÁFICAS ================= -->
+    <div class="chart-modal" id="chart-modal" role="dialog" aria-modal="true" aria-labelledby="chart-modal-title" aria-hidden="true">
+        <div class="chart-modal-dialog">
+            <div class="chart-modal-header">
+                <h2 class="chart-modal-title" id="chart-modal-title">Gráfica</h2>
+                <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
+            </div>
+            <div class="chart-modal-body">
+                <div class="chart-modal-canvas-wrapper" id="chart-modal-canvas-wrapper">
+                    <canvas id="chart-modal-canvas" aria-label="Gráfica ampliada"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODO PRESENTACIÓN ================= -->
+    <div class="presentation-overlay" id="presentation-overlay" role="dialog" aria-modal="true" aria-labelledby="presentation-title" aria-hidden="true">
+        <div class="presentation-content">
+            <!-- Logo y título -->
+            <div class="presentation-brand">
+                <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
+                <h1 class="presentation-title" id="presentation-title">Honor of Kings: Ultra Chaos</h1>
+            </div>
+
+            <!-- Contenedor para estadísticas generales -->
+            <div id="presentation-stats">
+                <!-- main.js inyectará aquí las estadísticas generales -->
+            </div>
+
+            <!-- Mejor equipo -->
+            <div id="best-team-presentation">
+                <!-- contenido dinámico: mejor equipo -->
+            </div>
+
+            <!-- Resumen de jugadores destacados por fase -->
+            <div id="presentation-featured-summary">
+                <!-- main.js puede llenar este contenedor -->
+            </div>
+
+            <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
+        </div>
+    </div>
+
+    <!-- ================= SCRIPTS (orden requerido) ================= -->
+    <script src="js/tournament_config.js"></script>
     <script src="js/main.js"></script>
+
 </body>
 </html>

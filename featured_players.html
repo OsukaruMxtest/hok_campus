@@ -2,107 +2,234 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jugadores Destacados - Honor of Kings Campus Series LATAM NORTE 2025</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Jugadores Destacados - Honor of Kings: Ultra Chaos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Estilos para el modo presentación: fases y tarjetas */
+        .presentation-featured-players {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .presentation-phase-group {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            backdrop-filter: blur(4px);
+        }
+        .presentation-phase-group h2 {
+            color: #F2ED9C;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        .presentation-players-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        .presentation-player-card {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 1rem;
+            flex: 1 1 180px;
+            max-width: 220px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(2px);
+        }
+        .presentation-player-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 0.5rem;
+            border: 2px solid #E372F2;
+        }
+        .presentation-player-card .p-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+        }
+        .presentation-player-card .p-team {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        .presentation-player-card .p-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+        .presentation-player-card .p-stats span {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .presentation-player-card .p-stats .stat-value {
+            font-weight: 600;
+            color: white;
+        }
+        .presentation-player-card .p-stats .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #aaa;
+        }
+
+        /* Asegurar que el indicador de carga no ocupe espacio cuando oculto */
+        #loading-indicator[hidden] {
+            display: none !important;
+        }
+        /* El modal sin botón de cierre visible, pero el overlay sigue */
+        .player-modal-overlay .modal-close-btn {
+            display: none;
+        }
+        /* El botón de cierre de presentación oculto */
+        .presentation-close-btn {
+            display: none;
+        }
+        /* Cursor para cerrar al hacer clic fuera */
+        .player-modal-overlay,
+        .presentation-overlay {
+            cursor: pointer;
+        }
+        .player-modal-content,
+        .presentation-content {
+            cursor: default;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation Menu -->
-    <nav class="main-nav" id="main-nav">
+
+    <!-- ===== NAVEGACIÓN ===== -->
+    <nav class="main-nav" id="main-nav" role="navigation" aria-label="Navegación principal">
         <div class="nav-container">
             <div class="nav-logo">
                 <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
-                <span>Honor of Kings LATAM NORTE 2025</span>
+                <span>Honor of Kings: Ultra Chaos</span>
             </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Dashboard Principal</a></li>
-                <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
-                <li><a href="stats.html" class="nav-link">Estadísticas Detalladas</a></li>
-                <li><a href="brackets.html" class="nav-link">Brackets del Torneo</a></li>
-                <li><a href="featured_players.html" class="nav-link active">Jugadores Destacados</a></li>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li role="none"><a href="index.html" class="nav-link" role="menuitem">Dashboard Principal</a></li>
+                <li role="none"><a href="teams.html" class="nav-link" role="menuitem">Equipos y Jugadores</a></li>
+                <li role="none"><a href="stats.html" class="nav-link" role="menuitem">Estadísticas Detalladas</a></li>
+                <li role="none"><a href="brackets.html" class="nav-link" role="menuitem">Llaves del Torneo</a></li>
+                <li role="none"><a href="featured_players.html" class="nav-link active" role="menuitem" aria-current="page">Jugadores Destacados</a></li>
             </ul>
-            <button class="nav-toggle" id="nav-toggle">☰</button>
+            <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Alternar menú de navegación" aria-controls="nav-menu" aria-expanded="false">☰</button>
         </div>
     </nav>
 
-    <div class="dashboard-container">
+    <!-- ===== DASHBOARD ===== -->
+    <main class="dashboard-container">
+
         <!-- Header -->
         <header class="dashboard-header">
             <div class="header-left">
-                <h1>Jugadores Destacados por Fase - Honor of Kings Campus Series LATAM NORTE 2025</h1>
+                <h1>Jugadores Destacados <small>Top por fase</small></h1>
             </div>
             <div class="header-right">
-                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
+                <button id="presentation-mode-toggle" class="btn-presentation" type="button" aria-controls="presentation-overlay" aria-expanded="false">Modo Presentación</button>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="dashboard-main">
-            <div class="content-area">
-                <div class="content-header">
-                    <div class="breadcrumb" id="breadcrumb">
-                        <span>Inicio > Jugadores Destacados</span>
+        <!-- Contenido principal -->
+        <div class="content-area">
+
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb" id="breadcrumb" aria-label="Ruta de navegación">
+                <span>Inicio › Jugadores Destacados</span>
+            </nav>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="loading-indicator" role="status" aria-live="polite" aria-label="Cargando datos de jugadores">
+                <div class="loading-spinner"></div>
+                <p>Cargando datos de jugadores...</p>
+            </div>
+
+            <!-- Secciones de jugadores por fase -->
+            <div class="featured-players-page">
+
+                <!-- Clasificatorias Día 1 -->
+                <section class="phase-section" id="cuartos-section" aria-labelledby="cuartos-title">
+                    <h2 class="phase-title" id="cuartos-title">🏆 Clasificatorias Día 1</h2>
+                    <div class="phase-description">Los mejores jugadores de la fase de clasificación</div>
+                    <div class="featured-players-grid" id="cuartos-players" role="list" aria-label="Top 10 jugadores de Clasificatorias Día 1">
+                        <!-- featured_players.js llena aquí -->
                     </div>
-                </div>
+                </section>
 
-                <!-- Loading Indicator -->
-                <div id="loading-indicator" class="loading-indicator">
-                    <div class="loading-spinner"></div>
-                    <p>Cargando datos de jugadores...</p>
-                </div>
-
-                <!-- Featured Players by Phase -->
-                <div class="featured-players-page">
-                    <!-- Cuartos de Final -->
-                    <section class="phase-section" id="cuartos-section">
-                        <h2 class="phase-title">🏆 Cuartos de Final - Top 10 Jugadores</h2>
-                        <div class="featured-players-grid" id="cuartos-players">
-                            <!-- Jugadores de cuartos se cargarán aquí -->
-                        </div>
-                    </section>
-
-                    <!-- Semifinal -->
-                    <section class="phase-section" id="semifinal-section">
-                        <h2 class="phase-title">🥈 Semifinal - Top 10 Jugadores</h2>
-                        <div class="featured-players-grid" id="semifinal-players">
-                            <!-- Jugadores de semifinal se cargarán aquí -->
-                        </div>
-                    </section>
-
-                    <!-- Final -->
-                    <section class="phase-section" id="final-section">
-                        <h2 class="phase-title">👑 Final - Top 10 Jugadores</h2>
-                        <div class="featured-players-grid" id="final-players">
-                            <!-- Jugadores de final se cargarán aquí -->
-                        </div>
-                    </section>
-                </div>
-
-                <!-- Statistics Summary -->
-                <div class="stats-summary glass fade-in">
-                    <h3>Resumen Estadístico</h3>
-                    <div class="stats-summary-grid" id="stats-summary">
-                        <!-- Resumen se cargará aquí -->
+                <!-- Semifinales -->
+                <section class="phase-section" id="semifinal-section" aria-labelledby="semifinal-title">
+                    <h2 class="phase-title" id="semifinal-title">🥈 Semifinales</h2>
+                    <div class="phase-description">Los mejores jugadores de las semifinales</div>
+                    <div class="featured-players-grid" id="semifinal-players" role="list" aria-label="Top 10 jugadores de Semifinales">
+                        <!-- featured_players.js llena aquí -->
                     </div>
+                </section>
+
+                <!-- Final -->
+                <section class="phase-section" id="final-section" aria-labelledby="final-title">
+                    <h2 class="phase-title" id="final-title">👑 Final</h2>
+                    <div class="phase-description">Los mejores jugadores de la gran final</div>
+                    <div class="featured-players-grid" id="final-players" role="list" aria-label="Top 10 jugadores de la Final">
+                        <!-- featured_players.js llena aquí -->
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Resumen estadístico -->
+            <div class="stats-summary glass fade-in" role="region" aria-labelledby="summary-title">
+                <h3 id="summary-title">Resumen Estadístico del Torneo</h3>
+                <div class="stats-summary-grid" id="stats-summary" role="list">
+                    <!-- featured_players.js llena aquí -->
                 </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Presentation Mode Overlay -->
-    <div class="presentation-overlay" id="presentation-overlay">
-        <div class="presentation-content">
-            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
-            <h1 class="presentation-title">Jugadores Destacados por Fase<br>Honor of Kings Campus Series LATAM NORTE 2025</h1>
-            <div class="presentation-featured-players" id="presentation-featured-players">
-                <!-- Jugadores destacados en presentación -->
+        </div>
+
+        <!-- ===== aria-live para actualizaciones ===== -->
+        <div aria-live="polite" aria-atomic="true" class="sr-only" id="featured-announcer"></div>
+
+    </main>
+
+    <!-- ===== MODAL DE JUGADOR ===== -->
+    <div class="player-modal-overlay" id="player-modal" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1" aria-labelledby="player-modal-title">
+        <div class="player-modal-content">
+            <div class="player-modal-header">
+                <h3 id="player-modal-title">Detalles del Jugador</h3>
+                <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
+            </div>
+            <div class="player-modal-body" id="player-modal-content">
+                <!-- featured_players.js inyecta contenido aquí -->
             </div>
         </div>
     </div>
 
+    <!-- ===== MODO PRESENTACIÓN ===== -->
+    <div class="presentation-overlay" id="presentation-overlay" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1" aria-label="Modo presentación de jugadores destacados">
+        <div class="presentation-content">
+            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
+            <h1 class="presentation-title">Jugadores Destacados<br>Honor of Kings: Ultra Chaos</h1>
+            <div class="presentation-featured-players" id="presentation-featured-players" aria-live="polite">
+                <!-- featured_players.js inyecta top 3 por fase -->
+            </div>
+            <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="js/tournament_config.js"></script>
     <script src="js/featured_players.js"></script>
+
 </body>
 </html>

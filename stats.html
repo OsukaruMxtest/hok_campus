@@ -2,146 +2,204 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas Detalladas - Honor of Kings Campus Series LATAM NORTE 2025</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Estadísticas Detalladas - Honor of Kings: Ultra Chaos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <!-- Navigation Menu -->
-    <nav class="main-nav" id="main-nav">
+
+    <!-- ===== NAVEGACIÓN ===== -->
+    <nav class="main-nav" id="main-nav" role="navigation" aria-label="Navegación principal">
         <div class="nav-container">
             <div class="nav-logo">
                 <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
-                <span>Honor of Kings LATAM NORTE 2025</span>
+                <span>Honor of Kings: Ultra Chaos</span>
             </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Dashboard Principal</a></li>
-                <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
-                <li><a href="stats.html" class="nav-link active">Estadísticas Detalladas</a></li>
-                <li><a href="brackets.html" class="nav-link">Brackets del Torneo</a></li>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li role="none"><a href="index.html" class="nav-link" role="menuitem">Dashboard Principal</a></li>
+                <li role="none"><a href="teams.html" class="nav-link" role="menuitem">Equipos y Jugadores</a></li>
+                <li role="none"><a href="stats.html" class="nav-link active" role="menuitem" aria-current="page">Estadísticas Detalladas</a></li>
+                <li role="none"><a href="brackets.html" class="nav-link" role="menuitem">Llaves del Torneo</a></li>
+                <li role="none"><a href="featured_players.html" class="nav-link" role="menuitem">Jugadores Destacados</a></li>
             </ul>
-            <button class="nav-toggle" id="nav-toggle">☰</button>
+            <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Alternar menú de navegación" aria-controls="nav-menu" aria-expanded="false">☰</button>
         </div>
     </nav>
 
-    <div class="dashboard-container">
+    <!-- ===== DASHBOARD ===== -->
+    <main class="dashboard-container">
+
         <!-- Header -->
         <header class="dashboard-header">
             <div class="header-left">
-                <h1>Estadísticas Detalladas</h1>
+                <h1>Estadísticas Detalladas <small>Análisis completo del torneo</small></h1>
             </div>
             <div class="header-right">
-                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
+                <button id="presentation-mode-toggle" class="btn-presentation" type="button" aria-controls="presentation-overlay" aria-expanded="false">Modo Presentación</button>
                 <div class="stats-filters">
-                    <select id="stats-phase-filter">
+                    <label for="stats-phase-filter">Fase:</label>
+                    <select id="stats-phase-filter" aria-label="Filtrar estadísticas por fase del torneo">
                         <option value="all">Todas las fases</option>
-                        <option value="cuartos">Cuartos de Final</option>
-                        <option value="semifinal">Semifinal</option>
+                        <option value="cuartos">Clasificatorias Día 1</option>
+                        <option value="semifinal">Semifinales</option>
                         <option value="final">Final</option>
                     </select>
                 </div>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="dashboard-main">
-            <div class="content-area">
-                <div class="content-header">
-                    <div class="breadcrumb">
-                        <span>Estadísticas Detalladas</span>
+        <!-- Introducción -->
+        <div class="stats-intro" role="note">
+            <span class="intro-icon" aria-hidden="true">📊</span>
+            <p>Visualiza el rendimiento de equipos y jugadores. <strong>Toca cualquier gráfica</strong> para ampliarla y ver los detalles con mayor claridad.</p>
+            <span class="hint-badge">🖱️ Click para ampliar</span>
+        </div>
+
+        <!-- ===== CONTENIDO PRINCIPAL ===== -->
+        <div class="content-area">
+
+            <!-- Tarjetas resumen -->
+            <div class="stats-summary-cards" id="stats-summary-cards" role="list" aria-label="Resumen de estadísticas del torneo">
+                <!-- stats.js inyecta aquí -->
+            </div>
+
+            <!-- Mensaje de estado para modos desactivados -->
+            <div id="stats-mode-message" class="stats-mode-message" hidden></div>
+
+            <!-- Rankings: Top Equipos y Top Jugadores -->
+            <div class="stats-dashboard-grid">
+
+                <div class="stat-category">
+                    <h2>🏆 Top Equipos</h2>
+                    <div class="ranking-section" id="top-teams-ranking" role="list" aria-label="Ranking de los mejores equipos">
+                        <!-- stats.js inyecta aquí -->
                     </div>
                 </div>
 
-                <!-- Stats Overview -->
-                <div class="stats-overview">
-                    <div class="stat-category">
-                        <h2>Estadísticas de Equipos</h2>
-                        <div class="stats-table-container">
-                            <table class="stats-table" id="team-stats-table">
-                                <thead>
-                                    <tr>
-                                        <th>Equipo</th>
-                                        <th>Partidos</th>
-                                        <th>Victorias</th>
-                                        <th>KDA</th>
-                                        <th>Daño Promedio</th>
-                                        <th>Oro Promedio</th>
-                                        <th>Participación</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Team stats will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="stat-category">
-                        <h2>Estadísticas de Jugadores</h2>
-                        <div class="stats-table-container">
-                            <table class="stats-table" id="player-stats-table">
-                                <thead>
-                                    <tr>
-                                        <th>Jugador</th>
-                                        <th>Equipo</th>
-                                        <th>KDA</th>
-                                        <th>Eliminaciones</th>
-                                        <th>Muertes</th>
-                                        <th>Asistencias</th>
-                                        <th>Daño Promedio</th>
-                                        <th>Oro Promedio</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Player stats will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="stat-category">
+                    <h2>⭐ Top Jugadores</h2>
+                    <div class="ranking-section" id="top-players-ranking" role="list" aria-label="Ranking de los mejores jugadores">
+                        <!-- stats.js inyecta aquí -->
                     </div>
                 </div>
 
-                <!-- Advanced Charts -->
-                <div class="advanced-charts">
-                    <div class="chart-row">
-                        <div class="chart-container large">
-                            <h3>Distribución de KDA por Equipo</h3>
-                            <canvas id="kda-chart"></canvas>
-                        </div>
-                        <div class="chart-container large">
-                            <h3>Evolución de Rendimiento por Fase</h3>
-                            <canvas id="performance-chart"></canvas>
-                        </div>
+            </div>
+
+            <!-- Gráficas avanzadas (organizadas en cuadrícula compacta) -->
+            <div class="advanced-charts">
+                <div class="charts-grid">
+                    <!-- Cada gráfica es un .chart-container que ahora actúa como tarjeta de la cuadrícula -->
+                    <div class="chart-container is-chart-expandable" id="kda-chart-card" data-chart-title="Distribución de KDA por Equipo" tabindex="0" role="button" aria-describedby="kda-chart-desc" aria-label="Ampliar gráfica: Distribución de KDA por Equipo">
+                        <h3 id="kda-chart-title">Distribución de KDA por Equipo</h3>
+                        <div class="chart-desc" id="kda-chart-desc">KDA promedio por equipo a lo largo del torneo</div>
+                        <div class="chart-wrap"><canvas id="kda-chart">Gráfica de KDA por equipo</canvas></div>
+                        <div class="chart-expand-hint">📊 Haz clic para ampliar</div>
                     </div>
-                    <div class="chart-row">
-                        <div class="chart-container large">
-                            <h3>Comparativa de Daño entre Equipos</h3>
-                            <canvas id="damage-comparison-chart"></canvas>
-                        </div>
-                        <div class="chart-container large">
-                            <h3>Eficiencia de Oro por Equipo</h3>
-                            <canvas id="gold-efficiency-chart"></canvas>
-                        </div>
+
+                    <div class="chart-container is-chart-expandable" id="performance-chart-card" data-chart-title="Evolución de Rendimiento por Fase" tabindex="0" role="button" aria-describedby="performance-chart-desc" aria-label="Ampliar gráfica: Evolución de Rendimiento por Fase">
+                        <h3 id="performance-chart-title">Evolución de Rendimiento por Fase</h3>
+                        <div class="chart-desc" id="performance-chart-desc">Comparativa de rendimiento de equipos a través de las fases</div>
+                        <div class="chart-wrap"><canvas id="performance-chart">Gráfica de evolución de rendimiento por fase</canvas></div>
+                        <div class="chart-expand-hint">📊 Haz clic para ampliar</div>
+                    </div>
+
+                    <div class="chart-container is-chart-expandable" id="damage-comparison-chart-card" data-chart-title="Comparativa de Daño entre Equipos" tabindex="0" role="button" aria-describedby="damage-comparison-chart-desc" aria-label="Ampliar gráfica: Comparativa de Daño entre Equipos">
+                        <h3 id="damage-comparison-chart-title">Comparativa de Daño entre Equipos</h3>
+                        <div class="chart-desc" id="damage-comparison-chart-desc">Daño total infligido por cada equipo durante el torneo</div>
+                        <div class="chart-wrap"><canvas id="damage-comparison-chart">Gráfica de comparativa de daño entre equipos</canvas></div>
+                        <div class="chart-expand-hint">📊 Haz clic para ampliar</div>
+                    </div>
+
+                    <div class="chart-container is-chart-expandable" id="gold-efficiency-chart-card" data-chart-title="Eficiencia de Oro por Equipo" tabindex="0" role="button" aria-describedby="gold-efficiency-chart-desc" aria-label="Ampliar gráfica: Eficiencia de Oro por Equipo">
+                        <h3 id="gold-efficiency-chart-title">Eficiencia de Oro por Equipo</h3>
+                        <div class="chart-desc" id="gold-efficiency-chart-desc">Oro total acumulado por equipo</div>
+                        <div class="chart-wrap"><canvas id="gold-efficiency-chart">Gráfica de eficiencia de oro por equipo</canvas></div>
+                        <div class="chart-expand-hint">📊 Haz clic para ampliar</div>
+                    </div>
+
+                    <div class="chart-container is-chart-expandable" id="top-players-chart-card" data-chart-title="Top Jugadores por Eliminaciones" tabindex="0" role="button" aria-describedby="top-players-chart-desc" aria-label="Ampliar gráfica: Top Jugadores por Eliminaciones">
+                        <h3 id="top-players-chart-title">Top Jugadores por Eliminaciones</h3>
+                        <div class="chart-desc" id="top-players-chart-desc">Jugadores con mayor cantidad de eliminaciones en el torneo</div>
+                        <div class="chart-wrap"><canvas id="top-players-chart">Gráfica de top jugadores por eliminaciones</canvas></div>
+                        <div class="chart-expand-hint">📊 Haz clic para ampliar</div>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Presentation Mode Overlay -->
-    <div class="presentation-overlay" id="presentation-overlay">
-        <div class="presentation-content">
-            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
-            <h1 class="presentation-title">Estadísticas Detalladas</h1>
-            <div class="presentation-stats-tables" id="presentation-stats-tables">
-                <!-- Stats tables will be displayed here -->
+            <!-- Tablas detalladas -->
+            <div class="stats-detailed-tables">
+
+                <div class="stat-category">
+                    <h2>📋 Estadísticas de Equipos</h2>
+                    <div class="stats-table-container">
+                        <table class="stats-table" id="team-stats-table" aria-label="Tabla de estadísticas detalladas de equipos">
+                            <caption>Estadísticas agregadas por equipo durante el torneo</caption>
+                            <thead id="team-stats-head">
+                                <!-- stats.js genera dinámicamente -->
+                            </thead>
+                            <tbody id="team-stats-body">
+                                <!-- stats.js inyecta aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="stat-category">
+                    <h2>📋 Estadísticas de Jugadores</h2>
+                    <div class="stats-table-container">
+                        <table class="stats-table" id="player-stats-table" aria-label="Tabla de estadísticas detalladas de jugadores">
+                            <caption>Estadísticas individuales de jugadores por equipo</caption>
+                            <thead id="player-stats-head">
+                                <!-- stats.js genera dinámicamente -->
+                            </thead>
+                            <tbody id="player-stats-body">
+                                <!-- stats.js inyecta aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===== aria-live para actualizaciones ===== -->
+        <div aria-live="polite" aria-atomic="true" class="sr-only" id="stats-announcer"></div>
+
+    </main>
+
+    <!-- ===== MODAL DE GRÁFICA (reutilizable) ===== -->
+    <div class="chart-modal" id="chart-modal" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1" aria-labelledby="chart-modal-title">
+        <div class="chart-modal-dialog">
+            <div class="chart-modal-header">
+                <h3 id="chart-modal-title">Estadísticas</h3>
+                <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
+            </div>
+            <div class="chart-modal-body">
+                <canvas id="chart-modal-canvas">Gráfica ampliada</canvas>
             </div>
         </div>
     </div>
 
+    <!-- ===== MODO PRESENTACIÓN ===== -->
+    <div class="presentation-overlay" id="presentation-overlay" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1" aria-label="Modo presentación de estadísticas">
+        <div class="presentation-content">
+            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
+            <h1 class="presentation-title">Estadísticas Detalladas</h1>
+            <div class="presentation-stats-tables" id="presentation-stats-tables" aria-live="polite">
+                <!-- stats.js inyecta aquí -->
+            </div>
+            <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="js/tournament_config.js"></script>
     <script src="js/stats.js"></script>
+
 </body>
 </html>

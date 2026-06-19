@@ -1,81 +1,152 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equipos y Jugadores - Honor of Kings Campus Series LATAM NORTE 2025</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>Equipos y Jugadores - Honor of Kings: Ultra Chaos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <!-- Navigation Menu -->
-    <nav class="main-nav" id="main-nav">
+
+    <!-- ===== NAVEGACIÓN ===== -->
+    <nav class="main-nav" id="main-nav" role="navigation" aria-label="Navegación principal">
         <div class="nav-container">
             <div class="nav-logo">
-                <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
-                <span>Honor of Kings LATAM NORTE 2025</span>
+                <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo" />
+                <span>Honor of Kings: Ultra Chaos</span>
             </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Dashboard Principal</a></li>
-                <li><a href="teams.html" class="nav-link active">Equipos y Jugadores</a></li>
-                <li><a href="stats.html" class="nav-link">Estadísticas Detalladas</a></li>
-                <li><a href="brackets.html" class="nav-link">Brackets del Torneo</a></li>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li role="none"><a href="index.html" class="nav-link" role="menuitem">Dashboard Principal</a></li>
+                <li role="none"><a href="teams.html" class="nav-link active" role="menuitem" aria-current="page">Equipos y Jugadores</a></li>
+                <li role="none"><a href="stats.html" class="nav-link" role="menuitem">Estadísticas Detalladas</a></li>
+                <li role="none"><a href="brackets.html" class="nav-link" role="menuitem">Llaves del Torneo</a></li>
+                <li role="none"><a href="featured_players.html" class="nav-link" role="menuitem">Jugadores Destacados</a></li>
             </ul>
-            <button class="nav-toggle" id="nav-toggle">☰</button>
+            <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Alternar menú de navegación" aria-controls="nav-menu" aria-expanded="false">☰</button>
         </div>
     </nav>
 
-    <div class="dashboard-container">
+    <!-- ===== DASHBOARD ===== -->
+    <main class="dashboard-container">
+
         <!-- Header -->
         <header class="dashboard-header">
             <div class="header-left">
-                <h1>Equipos y Jugadores</h1>
+                <h1>Equipos y Jugadores <small>Explora el torneo</small></h1>
             </div>
             <div class="header-right">
-                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
+                <button
+                    id="presentation-mode-toggle"
+                    class="btn-presentation"
+                    type="button"
+                    aria-controls="presentation-overlay presentation-teams"
+                    aria-expanded="false"
+                >Modo Presentación</button>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="dashboard-main">
-            <!-- Teams List -->
-            <div class="content-area">
-                <div class="content-header">
-                    <div class="breadcrumb">
-                        <span>Equipos y Jugadores</span>
-                    </div>
-                    <div class="search-container">
-                        <input type="text" id="team-search" placeholder="Buscar equipo o jugador...">
-                    </div>
+        <!-- Main: dos columnas con clase específica para la página -->
+        <div class="dashboard-main teams-page-layout">
+
+            <!-- Columna izquierda: buscador + listado -->
+            <aside class="teams-list-sidebar" aria-label="Listado de equipos y buscador">
+
+                <!-- Buscador -->
+                <div class="search-container" role="search">
+                    <label for="team-search">Buscar equipo o jugador</label>
+                    <span class="search-icon" aria-hidden="true">🔍</span>
+                    <input
+                    type="text"
+                    id="team-search"
+                    placeholder="Buscar equipo o jugador..."
+                    autocomplete="off"
+                    aria-label="Buscar equipos o jugadores"
+                    />
+                    <button class="search-clear" id="search-clear" type="button" aria-label="Limpiar búsqueda">✕</button>
                 </div>
 
-                <!-- Teams Grid -->
-                <div class="teams-grid" id="teams-grid">
-                    <!-- Teams will be loaded here -->
+                <!-- Grid de equipos (scroll) -->
+                <div class="teams-grid-wrapper" id="teams-grid-wrapper">
+                    <div class="teams-grid" id="teams-grid" role="list">
+                        <!-- teams.js inyecta aquí las tarjetas -->
+                    </div>
+                    <!-- Resultados de búsqueda de jugadores (inyectados por teams.js) -->
+                    <div class="search-results" id="search-results" role="list" aria-label="Resultados de búsqueda"></div>
                 </div>
 
-                <!-- Player Detail View -->
-                <div class="player-detail-view" id="player-detail-view">
-                    <!-- Player details will be loaded here -->
+                <!-- aria-live para anunciar resultados -->
+                <div aria-live="polite" aria-atomic="true" class="sr-only" id="search-announcer"></div>
+            </aside>
+
+            <!-- Columna derecha: panel de detalle -->
+            <section class="detail-right-panel" id="detail-right-panel" aria-label="Detalle del equipo o jugador">
+                <div class="detail-placeholder" id="player-detail-view">
+                    <!-- Contenido por defecto / detalle -->
+                    <div class="glass placeholder-message">
+                        <h3>Selecciona un equipo o jugador</h3>
+                        <p>Explora el torneo desde aquí.</p>
+                        <div class="hint-list">
+                            <span><span class="hint-icon">🖱️</span> Haz clic en un equipo para ver sus jugadores y estadísticas</span>
+                            <span><span class="hint-icon">👤</span> Haz clic en un jugador para analizar su rendimiento</span>
+                            <span><span class="hint-icon">🔍</span> Usa el buscador para encontrar rápidamente</span>
+                            <span><span class="hint-icon">📊</span> Toca la gráfica para ampliarla</span>
+                        </div>
+                        <div class="placeholder-icon" aria-hidden="true">🏆</div>
+                    </div>
                 </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ===== MODAL DE GRÁFICA (reutilizable, clases globales de style.css) ===== -->
+    <div
+        class="chart-modal"
+        id="chart-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        tabindex="-1"
+        aria-labelledby="chart-modal-title"
+    >
+        <div class="chart-modal-dialog">
+            <div class="chart-modal-header">
+                <h3 id="chart-modal-title">Estadísticas del Jugador</h3>
+                <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
             </div>
-        </main>
-    </div>
-
-    <!-- Presentation Mode Overlay -->
-    <div class="presentation-overlay" id="presentation-overlay">
-        <div class="presentation-content">
-            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
-            <h1 class="presentation-title">Equipos y Jugadores</h1>
-            <div class="presentation-teams" id="presentation-teams">
-                <!-- Teams will be displayed here -->
+            <div class="chart-modal-body">
+                <canvas id="chart-modal-canvas"></canvas>
             </div>
         </div>
     </div>
 
+    <!-- ===== MODO PRESENTACIÓN ===== -->
+    <div
+        class="presentation-overlay"
+        id="presentation-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        tabindex="-1"
+        aria-label="Modo presentación"
+    >
+        <div class="presentation-content">
+            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo" />
+            <h1 class="presentation-title">Equipos y Jugadores</h1>
+            <div class="presentation-teams" id="presentation-teams">
+                <!-- teams.js inyecta contenido -->
+            </div>
+            <!-- Botón de cierre eliminado (se cierra con Escape o clic fuera) -->
+        </div>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="js/tournament_config.js"></script>
     <script src="js/teams.js"></script>
+
 </body>
 </html>

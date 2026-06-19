@@ -1,95 +1,176 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brackets del Torneo - Honor of Kings Campus Series LATAM NORTE 2025</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Llaves del Torneo - Honor of Kings: Ultra Chaos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Estilos específicos para esta página: ancho completo y centrado -->
+  <style>
+    /* Eliminar restricciones de ancho en contenedores principales */
+    .dashboard-container {
+      max-width: 100% !important;
+      padding: 0 1rem !important;
+    }
+    .dashboard-main {
+      max-width: 100% !important;
+      padding: 0 !important;
+    }
+    .content-area.full-width {
+      max-width: 100% !important;
+      padding: 0 !important;
+    }
+    .hok-brackets-shell {
+      padding: 0 !important;
+      margin: 0 auto !important;
+      width: 100% !important;
+    }
+    /* El grid se define en style.css, no interferir */
+    .hok-bracket-container {
+      /* No aplicar flex, usar grid */
+      display: grid !important;
+    }
+    /* Ajustar la presentación para que ocupe todo el ancho */
+    .presentation-content.bracket-presentation-content {
+      max-width: 95% !important;
+      width: 95% !important;
+      padding: 1.5rem !important;
+    }
+    .presentation-bracket-stage {
+      width: 100% !important;
+    }
+    /* Ocultar el botón de cierre visualmente, pero mantenerlo en el DOM */
+    .presentation-close-btn {
+      display: none !important;
+    }
+    /* Asegurar que el overlay cierre al hacer clic fuera */
+    .presentation-overlay {
+      cursor: pointer;
+    }
+    .presentation-content {
+      cursor: default;
+    }
+    /* Evitar scroll horizontal en pantallas grandes */
+    @media (min-width: 1200px) {
+      body {
+        overflow-x: hidden;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation Menu -->
-    <nav class="main-nav" id="main-nav">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
-                <span>Honor of Kings LATAM NORTE 2025</span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Dashboard Principal</a></li>
-                <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
-                <li><a href="stats.html" class="nav-link">Estadísticas Detalladas</a></li>
-                <li><a href="brackets.html" class="nav-link active">Brackets del Torneo</a></li>
-            </ul>
-            <button class="nav-toggle" id="nav-toggle">☰</button>
-        </div>
-    </nav>
 
-    <div class="dashboard-container">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <div class="header-left">
-                <h1>Brackets del Torneo</h1>
-            </div>
-            <div class="header-right">
-                <button id="presentation-mode-toggle" class="btn-presentation">Modo Presentación</button>
-                <div class="bracket-controls">
-                    <button id="zoom-in" class="btn-secondary">+</button>
-                    <button id="zoom-out" class="btn-secondary">-</button>
-                    <button id="reset-view" class="btn-secondary">Reset</button>
-                </div>
-            </div>
-        </header>
+  <nav class="main-nav" id="main-nav" role="navigation" aria-label="Menú principal">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="assets/logo.png" alt="Honor of Kings Logo" class="logo">
+        <span>Honor of Kings: Ultra Chaos</span>
+      </div>
 
-        <!-- Main Content -->
-        <main class="dashboard-main">
-            <div class="content-area full-width">
-                <div class="content-header">
-                    <div class="breadcrumb">
-                        <span>Brackets del Torneo</span>
-                    </div>
-                    <div class="bracket-phase-selector">
-                        <button class="phase-btn active" data-phase="all">Todos</button>
-                        <button class="phase-btn" data-phase="cuartos">Cuartos</button>
-                        <button class="phase-btn" data-phase="semifinal">Semifinal</button>
-                        <button class="phase-btn" data-phase="final">Final</button>
-                    </div>
-                </div>
+      <ul class="nav-menu" id="nav-menu">
+        <li><a href="index.html" class="nav-link">Dashboard Principal</a></li>
+        <li><a href="teams.html" class="nav-link">Equipos y Jugadores</a></li>
+        <li><a href="stats.html" class="nav-link">Estadísticas Detalladas</a></li>
+        <li><a href="brackets.html" class="nav-link active" aria-current="page">Llaves del Torneo</a></li>
+        <li><a href="featured_players.html" class="nav-link">Jugadores Destacados</a></li>
+      </ul>
 
-                <!-- Bracket Visualization -->
-                <div class="bracket-visualization-container">
-                    <div class="bracket-visualization" id="bracket-visualization">
-                        <!-- Bracket will be rendered here -->
-                    </div>
-                </div>
-
-                <!-- Match Details -->
-                <div class="match-details-panel" id="match-details-panel">
-                    <div class="match-details-header">
-                        <h3>Detalles del Partido</h3>
-                        <button id="close-match-details" class="btn-close">×</button>
-                    </div>
-                    <div class="match-details-content" id="match-details-content">
-                        <!-- Match details will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </main>
+      <button class="nav-toggle" id="nav-toggle" type="button" aria-controls="nav-menu" aria-expanded="false" aria-label="Alternar menú de navegación">☰</button>
     </div>
+  </nav>
 
-    <!-- Presentation Mode Overlay -->
-    <div class="presentation-overlay" id="presentation-overlay">
-        <div class="presentation-content">
-            <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
-            <h1 class="presentation-title">Brackets del Torneo</h1>
-            <div class="presentation-bracket" id="presentation-bracket">
-                <!-- Bracket will be displayed here -->
+  <div class="dashboard-container">
+    <header class="dashboard-header">
+      <div class="header-left">
+        <h1>Llaves del Torneo</h1>
+      </div>
+
+      <div class="header-right">
+        <button id="presentation-mode-toggle" class="btn-presentation" type="button" aria-controls="presentation-overlay" aria-expanded="false">
+          Modo Presentación
+        </button>
+        <button id="reload-bracket-data" class="btn-secondary" type="button">
+          Recargar Datos
+        </button>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <section class="content-area full-width hok-brackets-page" aria-busy="true">
+        <div class="hok-brackets-shell">
+          <div id="bracket-status" class="hok-bracket-status" role="status" aria-live="polite">
+            Cargando llaves...
+          </div>
+
+          <div
+            id="bracket-loader"
+            class="hok-loader"
+            role="status"
+            aria-label="Cargando datos de las llaves"
+            aria-hidden="false"
+          ></div>
+
+          <!-- Estructura de 5 columnas: left_R3, left_R4, center (con R5 y R6), right_R4, right_R3 -->
+          <div id="bracket-container" class="hok-bracket-container is-hidden">
+            <!-- Columna 1: Cuartos izquierda -->
+            <div id="left_R3" class="hok-round-column hok-small-round">
+              <h2 class="header-R3">Cuartos</h2>
             </div>
-        </div>
-    </div>
 
-    <script src="js/brackets.js"></script>
+            <!-- Columna 2: Semifinal izquierda -->
+            <div id="left_R4" class="hok-round-column hok-small-round">
+              <h2 class="header-R4">Semifinal</h2>
+            </div>
+
+            <!-- Columna 3: Centro (Final y Tercer Puesto) -->
+            <div class="hok-bracket-center" id="centerBracket">
+              <div id="center_R5" class="hok-round-column hok-bracket-final-slot">
+                <h2 class="header-R5">🏆 Final</h2>
+              </div>
+              <div id="center_R6" class="hok-round-column hok-third-place-slot">
+                <h2 class="header-R6">🥉 Tercer Puesto</h2>
+              </div>
+            </div>
+
+            <!-- Columna 4: Semifinal derecha -->
+            <div id="right_R4" class="hok-round-column hok-small-round">
+              <h2 class="header-R4">Semifinal</h2>
+            </div>
+
+            <!-- Columna 5: Cuartos derecha -->
+            <div id="right_R3" class="hok-round-column hok-small-round">
+              <h2 class="header-R3">Cuartos</h2>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div
+    class="presentation-overlay"
+    id="presentation-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="presentation-title"
+    aria-hidden="true"
+    tabindex="-1"
+  >
+    <div class="presentation-content bracket-presentation-content">
+      <img src="assets/logo.png" alt="Honor of Kings Logo" class="presentation-logo">
+      <h1 class="presentation-title" id="presentation-title">Llaves del Torneo</h1>
+      <div class="presentation-bracket-stage" id="presentation-bracket"></div>
+      <!-- Botón oculto visualmente pero presente para que el script lo encuentre -->
+      <button class="presentation-close-btn" id="presentation-close-btn" type="button" aria-label="Cerrar modo presentación" style="display:none;">✕ Cerrar</button>
+    </div>
+  </div>
+
+  <script src="js/tournament_config.js"></script>
+  <script src="js/brackets.js?v=3"></script>
 </body>
 </html>
