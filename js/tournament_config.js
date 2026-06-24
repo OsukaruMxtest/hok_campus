@@ -118,8 +118,8 @@
   //  MÉTRICAS POR MODO DE JUEGO
   // ============================================================
   CONFIG.statsModes = {
-    modo_5v5: false,
-    modo_chaos: true
+    modo_5v5: true,
+    modo_chaos: false
   };
 
   CONFIG.statMetrics = {
