@@ -5061,3 +5061,120 @@ input:focus-visible {
         min-height: 400px;
     }
 }
+/* ============================================================
+   TEAM LOGOS — ESTILOS CENTRALIZADOS
+   Evita depender de estilos inyectados desde JS.
+   ============================================================ */
+
+/* Propiedades comunes a todos los logos de equipo */
+.team-card-logo,
+.team-detail-logo,
+.presentation-team-logo,
+.hok-team-logo,
+.featured-player-team-logo,
+.hok-stats-team-logo {
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(218, 194, 151, 0.18);
+}
+
+/* --- Tarjeta de equipo (teams page, dashboard) --- */
+.team-card-logo {
+    width: 48px;
+    height: 48px;
+}
+
+/* --- Detalle de equipo (panel lateral, hero section) --- */
+.team-detail-logo {
+    width: 90px;
+    height: 90px;
+    border-color: var(--primary-yellow);
+    border-width: 2px;
+}
+
+/* --- Presentación general de equipo --- */
+.presentation-team-logo {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 0 auto 0.75rem;
+}
+
+/* --- Bracket HOK: logo inline dentro de .hok-team --- */
+.hok-team-logo {
+    width: 28px;
+    height: 28px;
+}
+
+/* --- Featured players: logo del equipo junto al nombre --- */
+.featured-player-team-logo {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+/* --- Stats / ranking tables --- */
+.hok-stats-team-logo {
+    width: 28px;
+    height: 28px;
+    vertical-align: middle;
+}
+
+/* ============================================================
+   BRACKET HOK — ajuste de fila de equipo con logo
+   ============================================================ */
+.hok-team {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.hok-team .team-name,
+.hok-team .hok-team-name {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.hok-team .hok-kills-container {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Lado derecho: nombre alineado a la derecha */
+.hok-bracket-half.hok-half-right .hok-team .team-name,
+.hok-bracket-half.hok-half-right .hok-team .hok-team-name {
+    text-align: right;
+}
+
+/* ============================================================
+   FEATURED PLAYERS — logo + nombre de equipo en línea
+   ============================================================ */
+.player-team,
+.modal-player-team,
+.pres-team {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   STATS TABLES — celda con logo + nombre alineados
+   ============================================================ */
+.stats-team-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.stats-team-cell span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
