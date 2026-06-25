@@ -20,6 +20,19 @@ function escapeHTML(str) {
     return String(str).replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
+// ============================================================
+// GLOBAL TEAM LOGO FALLBACK
+// ============================================================
+window.handleTeamLogoError = function(img, teamName) {
+    if (img.dataset.logoManaged === 'team' && window.featuredPlayers && typeof window.featuredPlayers.applyTeamLogoFallback === 'function') {
+        window.featuredPlayers.applyTeamLogoFallback(img, teamName);
+        return;
+    }
+    img.src = 'assets/logos/default_logo.png';
+    img.onerror = null;
+};
+// ============================================================
+
 // Parser CSV robusto con soporte para comillas, comas escapadas, saltos \r\n y BOM
 function parseCSV(csvText) {
     if (!csvText || typeof csvText !== 'string') return [];
@@ -97,6 +110,44 @@ function parseCSV(csvText) {
     }
     return data;
 }
+
+// ============================================================
+// INYECCIÓN DE ESTILOS PARA LOGOS EN FEATURED PLAYERS
+// ============================================================
+(function injectFeaturedStyles() {
+    if (document.getElementById('hok-featured-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'hok-featured-styles';
+    style.textContent = `
+        .featured-player-team-logo {
+            width: 20px;
+            height: 20px;
+            margin-left: 4px;
+            margin-right: 4px;
+            vertical-align: middle;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: rgba(255,255,255,0.1);
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .player-team {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .modal-player-team .featured-player-team-logo {
+            width: 24px;
+            height: 24px;
+        }
+        .pres-team .featured-player-team-logo {
+            width: 18px;
+            height: 18px;
+        }
+    `;
+    document.head.appendChild(style);
+})();
 
 class FeaturedPlayersDashboard {
     constructor() {
@@ -185,6 +236,48 @@ class FeaturedPlayersDashboard {
         }
         return null;
     }
+
+    // ================== HELPERS PARA LOGOS DE EQUIPOS ==================
+    getTeamLogo(teamName) {
+        if (!teamName) return 'assets/logos/default_logo.png';
+        const config = window.TOURNAMENT_CONFIG;
+        if (config && config.helpers && typeof config.helpers.getTeamLogoCandidates === 'function') {
+            const candidates = config.helpers.getTeamLogoCandidates(teamName);
+            if (candidates && candidates.length > 0) {
+                return candidates[0];
+            }
+        }
+        return 'assets/logos/default_logo.png';
+    }
+
+    applyTeamLogoFallback(imgElement, teamName) {
+        if (!imgElement) return;
+        const config = window.TOURNAMENT_CONFIG;
+        if (!config || !config.helpers || typeof config.helpers.getTeamLogoCandidates !== 'function') {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+        const candidates = config.helpers.getTeamLogoCandidates(teamName);
+        if (!candidates || candidates.length === 0) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+        let currentIndex = parseInt(imgElement.dataset.logoRetryIndex);
+        if (isNaN(currentIndex) || currentIndex < 1) {
+            currentIndex = 1;
+        }
+        if (currentIndex >= candidates.length) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            imgElement.dataset.logoRetryIndex = candidates.length + 1;
+            return;
+        }
+        imgElement.src = candidates[currentIndex];
+        imgElement.dataset.logoRetryIndex = currentIndex + 1;
+    }
+    // ================================================================
 
     // ================== INICIALIZACIÓN ==================
     async init() {
@@ -360,9 +453,24 @@ class FeaturedPlayersDashboard {
         nameDiv.className = 'modal-player-name';
         nameDiv.textContent = playerName;
 
+        // Equipo con logo
         const teamDiv = document.createElement('div');
         teamDiv.className = 'modal-player-team';
-        teamDiv.textContent = `${team} · ${phaseNames[phase] || phase}`;
+        const logoSrc = this.getTeamLogo(team);
+        const teamLogo = document.createElement('img');
+        teamLogo.className = 'featured-player-team-logo';
+        teamLogo.src = logoSrc;
+        teamLogo.alt = team;
+        teamLogo.setAttribute('aria-hidden', 'true');
+        teamLogo.dataset.logoManaged = 'team';
+        teamLogo.dataset.logoRetryIndex = '1';
+        teamLogo.onerror = function() {
+            window.handleTeamLogoError(this, team);
+        };
+
+        const teamText = document.createTextNode(`${team} · ${phaseNames[phase] || phase}`);
+        teamDiv.appendChild(teamLogo);
+        teamDiv.appendChild(teamText);
 
         headerDiv.appendChild(rankDiv);
         headerDiv.appendChild(nameDiv);
@@ -822,9 +930,27 @@ class FeaturedPlayersDashboard {
             nameDiv.className = 'player-name';
             nameDiv.textContent = playerName;
 
+            const team = this.getPlayerTeam(playerName, phase) || '';
             const teamDiv = document.createElement('div');
             teamDiv.className = 'player-team';
-            teamDiv.textContent = this.getPlayerTeam(playerName, phase) || '';
+            if (team) {
+                const logoSrc = this.getTeamLogo(team);
+                const teamLogo = document.createElement('img');
+                teamLogo.className = 'featured-player-team-logo';
+                teamLogo.src = logoSrc;
+                teamLogo.alt = team;
+                teamLogo.setAttribute('aria-hidden', 'true');
+                teamLogo.dataset.logoManaged = 'team';
+                teamLogo.dataset.logoRetryIndex = '1';
+                teamLogo.onerror = function() {
+                    window.handleTeamLogoError(this, team);
+                };
+                const teamText = document.createTextNode(team);
+                teamDiv.appendChild(teamLogo);
+                teamDiv.appendChild(teamText);
+            } else {
+                teamDiv.textContent = 'Sin equipo';
+            }
 
             const statsDiv = document.createElement('div');
             statsDiv.className = 'player-stats-mini';
@@ -1042,11 +1168,17 @@ class FeaturedPlayersDashboard {
                         statsHtml += `<span>${icon} <span class="pres-val">${display}</span></span>`;
                     });
 
+                    const team = this.getPlayerTeam(player.name, phase) || '';
+                    const logoSrc = this.getTeamLogo(team);
+                    const teamLogoHtml = team ? `<img class="featured-player-team-logo" src="${logoSrc}" alt="${escapeHTML(team)}" aria-hidden="true" 
+                        data-logo-managed="team" data-logo-retry-index="1"
+                        onerror="window.handleTeamLogoError(this, '${escapeHTML(team)}')" />` : '';
+
                     html += `
                         <div class="presentation-player-card" role="listitem">
                             <div class="pres-rank">${rankIcon} #${idx+1}</div>
                             <div class="pres-name">${escapeHTML(player.name)}</div>
-                            <div class="pres-team">${escapeHTML(this.getPlayerTeam(player.name, phase) || '')}</div>
+                            <div class="pres-team">${teamLogoHtml}${escapeHTML(team)}</div>
                             <div class="pres-stats">${statsHtml}</div>
                         </div>
                     `;
@@ -1095,5 +1227,19 @@ class FeaturedPlayersDashboard {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new FeaturedPlayersDashboard();
+    window.featuredPlayers = new FeaturedPlayersDashboard();
 });
+
+// Fallback global de imágenes – ignorar logos de equipo administrados
+window.addEventListener('error', (e) => {
+    const image = e.target;
+    if (!(image instanceof HTMLImageElement)) return;
+    if (image.dataset.logoManaged === 'team') return;
+    const src = image.src || '';
+    if (src.includes('default_logo.png')) return;
+    if (src.includes('assets/logos/') || src.includes('assets/players/')) {
+        image.dataset.fallbackApplied = 'true';
+        image.src = 'assets/logos/default_logo.png';
+        image.onerror = null;
+    }
+}, true);

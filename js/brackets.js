@@ -17,7 +17,7 @@
     };
 
     // ============================================================
-    // INYECCIÓN DE ESTILOS CON ANIMACIÓN DE FLOTACIÓN
+    // INYECCIÓN DE ESTILOS CON ANIMACIÓN DE FLOTACIÓN Y LOGOS
     // ============================================================
 
     (function injectStyles() {
@@ -59,9 +59,111 @@
                 width: 24px;
                 height: 24px;
             }
+            /* Estilos para logos de equipos en bracket */
+            .hok-team-logo {
+                width: 28px;
+                height: 28px;
+                margin-right: 6px;
+                vertical-align: middle;
+                border-radius: 50%;
+                object-fit: cover;
+                background-color: rgba(255,255,255,0.1);
+                flex-shrink: 0;
+            }
+            .hok-team {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                flex-wrap: wrap;
+            }
+            .hok-team .team-name {
+                margin-right: 2px;
+            }
         `;
         document.head.appendChild(style);
     })();
+
+    // ============================================================
+    // HELPERS PARA LOGOS DE EQUIPOS (centralizados)
+    // ============================================================
+
+    /**
+     * Obtiene los candidatos de logo para un equipo usando la configuración centralizada.
+     * @param {string} teamName
+     * @returns {string[]} Arreglo de rutas de imagen (o [default] si no hay configuración)
+     */
+    function getTeamLogoCandidates(teamName) {
+        var config = window.TOURNAMENT_CONFIG;
+        if (config && config.helpers && typeof config.helpers.getTeamLogoCandidates === 'function') {
+            return config.helpers.getTeamLogoCandidates(teamName);
+        }
+        // Fallback local: usar default
+        return ['assets/logos/default_logo.png'];
+    }
+
+    /**
+     * Obtiene el primer candidato de logo para un equipo.
+     * @param {string} teamName
+     * @returns {string} Ruta del primer candidato o default.
+     */
+    function getTeamLogo(teamName) {
+        if (!teamName || teamName === 'PENDIENTE') {
+            return 'assets/logos/default_logo.png';
+        }
+        var candidates = getTeamLogoCandidates(teamName);
+        return candidates && candidates.length > 0 ? candidates[0] : 'assets/logos/default_logo.png';
+    }
+
+    /**
+     * Función de fallback por extensiones para imágenes de equipo.
+     * Se llama desde el evento onerror de la imagen.
+     * @param {HTMLImageElement} imgElement
+     * @param {string} teamName
+     */
+    function applyTeamLogoFallback(imgElement, teamName) {
+        if (!imgElement) return;
+
+        // Si el equipo es PENDIENTE, ya debería tener default y no llamar a esta función.
+        // Pero por seguridad, si se llama, asignar default y quitar onerror.
+        if (teamName === 'PENDIENTE') {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+
+        var config = window.TOURNAMENT_CONFIG;
+        if (!config || !config.helpers || typeof config.helpers.getTeamLogoCandidates !== 'function') {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+
+        var candidates = config.helpers.getTeamLogoCandidates(teamName);
+        if (!candidates || candidates.length === 0) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+
+        // Leer índice actual; si no existe o es 0, empezar en 1 (porque el primer candidato ya se usó)
+        var currentIndex = parseInt(imgElement.dataset.logoRetryIndex);
+        if (isNaN(currentIndex) || currentIndex < 1) {
+            currentIndex = 1;
+        }
+
+        // Si ya se probaron todos los candidatos, usar default
+        if (currentIndex >= candidates.length) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            imgElement.dataset.logoRetryIndex = candidates.length + 1;
+            return;
+        }
+
+        // Probar el siguiente candidato
+        imgElement.src = candidates[currentIndex];
+        imgElement.dataset.logoRetryIndex = currentIndex + 1;
+        // El onerror seguirá llamando a esta función
+    }
 
     // ============================================================
     // VARIABLES DE ESTADO
@@ -389,6 +491,40 @@
             teamDiv.classList.add('winner');
         }
 
+        var teamName = teamData.nombre || 'PENDIENTE';
+        var logoSrc;
+
+        // Para PENDIENTE: usar default directamente y no intentar fallback
+        if (teamName === 'PENDIENTE') {
+            logoSrc = 'assets/logos/default_logo.png';
+        } else {
+            logoSrc = getTeamLogo(teamName);
+        }
+
+        var img = document.createElement('img');
+        img.className = 'hok-team-logo';
+        img.src = logoSrc;
+        img.alt = teamName;
+        img.setAttribute('aria-hidden', 'true');
+
+        if (teamName === 'PENDIENTE') {
+            // No gestionar fallback, usar default y desactivar onerror
+            img.onerror = function() {
+                this.src = 'assets/logos/default_logo.png';
+                this.onerror = null;
+            };
+        } else {
+            // Configurar fallback por extensiones
+            img.dataset.logoManaged = 'team';
+            img.dataset.logoRetryIndex = '1';
+            img.onerror = function() {
+                // Usar la función global applyTeamLogoFallback
+                applyTeamLogoFallback(this, teamName);
+            };
+        }
+
+        teamDiv.appendChild(img);
+
         var nameSpan = document.createElement('span');
         nameSpan.className = 'team-name';
         nameSpan.textContent = teamData.nombre || 'PENDIENTE';
@@ -411,15 +547,13 @@
         // Añadir icono de ganador
         if (isWinner) {
             if (round === 'R3' || round === 'R4') {
-                // win.png con animación de flotación
-                var img = document.createElement('img');
-                img.src = 'assets/win.png';
-                img.alt = '';
-                img.setAttribute('aria-hidden', 'true');
-                img.className = 'hok-win-game-icon';
-                teamDiv.appendChild(img);
+                var imgWin = document.createElement('img');
+                imgWin.src = 'assets/win.png';
+                imgWin.alt = '';
+                imgWin.setAttribute('aria-hidden', 'true');
+                imgWin.className = 'hok-win-game-icon';
+                teamDiv.appendChild(imgWin);
             } else if (round === 'R5') {
-                // Final: usar winner.png con clase específica y fallback a 🏆
                 var finalWinnerImg = document.createElement('img');
                 finalWinnerImg.src = 'assets/winner.png';
                 finalWinnerImg.alt = '';
@@ -438,14 +572,12 @@
 
                 teamDiv.appendChild(finalWinnerImg);
             } else if (round === 'R6') {
-                // Tercer puesto: bronce
                 var iconSpan2 = document.createElement('span');
                 iconSpan2.className = 'hok-winner-icon r6';
                 iconSpan2.textContent = '\uD83E\uDD49';
                 teamDiv.appendChild(iconSpan2);
             }
         } else if (isRunnerUp && round === 'R5') {
-            // Subcampeón: plata
             var runnerSpan = document.createElement('span');
             runnerSpan.className = 'hok-winner-icon r6';
             runnerSpan.textContent = '\uD83E\uDD48';

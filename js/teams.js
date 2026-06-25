@@ -1,5 +1,17 @@
 // Teams and Players Page
 
+// Función global para manejar el fallback de logos de equipo
+window.handleTeamLogoError = function(img, teamName) {
+    // Si la imagen es administrada y la página ya está inicializada, usar el fallback controlado
+    if (img.dataset.logoManaged === 'team' && window.teamsPage && typeof window.teamsPage.applyTeamLogoFallback === 'function') {
+        window.teamsPage.applyTeamLogoFallback(img, teamName);
+        return;
+    }
+    // Fallback seguro
+    img.src = 'assets/logos/default_logo.png';
+    img.onerror = null;
+};
+
 function resolvePhaseId(phaseId) {
     const alias = {
         cuartos: 'cuartos',
@@ -638,11 +650,16 @@ class TeamsPage {
                 `;
             });
 
+            const escapedTeam = escapeHTML(team);
+            const logoSrc = this.getTeamLogo(team);
+
             html += `
                 <div class="presentation-card glass">
                     <div class="presentation-team-content">
-                        <img src="${this.getTeamLogo(team)}" alt="${escapeHTML(team)}" class="presentation-team-logo" onerror="this.onerror=null; this.src='assets/logos/default_logo.png'">
-                        <h3 class="presentation-team-name">${escapeHTML(team)}</h3>
+                        <img src="${logoSrc}" alt="${escapedTeam}" class="presentation-team-logo" 
+                             data-logo-managed="team" data-logo-retry-index="1"
+                             onerror="window.handleTeamLogoError(this, '${escapedTeam}')">
+                        <h3 class="presentation-team-name">${escapedTeam}</h3>
                         <div class="presentation-team-stats-grid">
                             <div class="pres-team-stat">
                                 <span class="pres-stat-icon">🏆</span>
@@ -899,7 +916,9 @@ class TeamsPage {
 
         teamCard.innerHTML = `
             <div class="team-card-header" role="button" tabindex="0" aria-label="Ver detalles del equipo ${escapedTeam}" aria-pressed="${isSelected ? 'true' : 'false'}">
-                <img src="${logo}" alt="${escapedTeam}" class="team-card-logo" onerror="this.onerror=null; this.src='assets/logos/default_logo.png'">
+                <img src="${logo}" alt="${escapedTeam}" class="team-card-logo" 
+                     data-logo-managed="team" data-logo-retry-index="1"
+                     onerror="window.handleTeamLogoError(this, '${escapedTeam}')">
                 <h3 class="team-card-name">${escapedTeam}</h3>
             </div>
             <div class="team-card-stats">
@@ -1032,12 +1051,17 @@ class TeamsPage {
             }
         }
 
+        const escapedTeam = escapeHTML(teamName);
+        const logoSrc = this.getTeamLogo(teamName);
+
         const content = `
             <div class="team-detail glass">
                 <div class="team-detail-header">
-                    <img src="${this.getTeamLogo(teamName)}" alt="${escapeHTML(teamName)}" class="team-detail-logo" onerror="this.onerror=null; this.src='assets/logos/default_logo.png'">
+                    <img src="${logoSrc}" alt="${escapedTeam}" class="team-detail-logo" 
+                         data-logo-managed="team" data-logo-retry-index="1"
+                         onerror="window.handleTeamLogoError(this, '${escapedTeam}')">
                     <div>
-                        <h2 class="team-detail-name">${escapeHTML(teamName)}</h2>
+                        <h2 class="team-detail-name">${escapedTeam}</h2>
                         <p>Victorias: ${this.formatNumber(wins)} | Partidos: ${this.formatNumber(matches)}</p>
                     </div>
                 </div>
@@ -1701,10 +1725,56 @@ class TeamsPage {
         return Array.from(players);
     }
 
+    // ================== LOGO DE EQUIPO (centralizado) ==================
     getTeamLogo(teamName) {
-        const cleanName = teamName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        return `assets/logos/${cleanName}.png`;
+        const config = window.TOURNAMENT_CONFIG;
+        if (config && config.helpers && config.helpers.getTeamLogoCandidates) {
+            const candidates = config.helpers.getTeamLogoCandidates(teamName);
+            if (candidates && candidates.length > 0) {
+                return candidates[0]; // primer candidato
+            }
+        }
+        return 'assets/logos/default_logo.png';
     }
+
+    // Fallback controlado por extensiones
+    applyTeamLogoFallback(imgElement, teamName) {
+        if (!imgElement) return;
+
+        const config = window.TOURNAMENT_CONFIG;
+        if (!config || !config.helpers || !config.helpers.getTeamLogoCandidates) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+
+        const candidates = config.helpers.getTeamLogoCandidates(teamName);
+        if (!candidates || candidates.length === 0) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+
+        // Leer índice actual; si no existe, empezar en 1 (porque el primer candidato ya se usó en src)
+        let currentIndex = parseInt(imgElement.dataset.logoRetryIndex);
+        if (isNaN(currentIndex) || currentIndex < 1) {
+            currentIndex = 1;
+        }
+
+        // Si ya se probaron todos los candidatos, usar default
+        if (currentIndex >= candidates.length) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            imgElement.dataset.logoRetryIndex = candidates.length + 1;
+            return;
+        }
+
+        // Probar el siguiente candidato
+        imgElement.src = candidates[currentIndex];
+        imgElement.dataset.logoRetryIndex = currentIndex + 1;
+        // El onerror ya está configurado para llamar a esta función de nuevo
+    }
+    // ================================================================
 
     getPlayerImage(playerName) {
         const cleanName = playerName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
@@ -1946,13 +2016,19 @@ document.addEventListener('DOMContentLoaded', () => {
     window.teamsPage = new TeamsPage();
 });
 
+// Fallback global de imágenes – modificado para ignorar logos de equipo administrados
 window.addEventListener('error', (e) => {
     if (e.target.tagName === 'IMG') {
-        const src = e.target.src || '';
+        const img = e.target;
+        // Ignorar imágenes administradas (logos de equipo)
+        if (img.dataset.logoManaged === 'team') {
+            return;
+        }
+        const src = img.src || '';
         if (src.includes('default_logo.png')) return;
         if (src.includes('assets/logos/') || src.includes('assets/players/')) {
-            e.target.onerror = null;
-            e.target.src = 'assets/logos/default_logo.png';
+            img.onerror = null;
+            img.src = 'assets/logos/default_logo.png';
         }
     }
 }, true);

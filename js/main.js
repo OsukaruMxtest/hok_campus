@@ -148,6 +148,19 @@ function naturalSortBrackets(brackets) {
     });
 }
 
+// ============================================================
+// GLOBAL TEAM LOGO FALLBACK (used by onerror attributes)
+// ============================================================
+window.handleTeamLogoError = function(img, teamName) {
+    if (window.dashboard && typeof window.dashboard.applyTeamLogoFallback === 'function') {
+        window.dashboard.applyTeamLogoFallback(img, teamName);
+    } else {
+        // Fallback seguro si la instancia no está lista
+        img.src = 'assets/logos/default_logo.png';
+        img.onerror = null;
+    }
+};
+
 class HonorOfKingsDashboard {
     constructor() {
         this.data = {
@@ -1319,7 +1332,9 @@ class HonorOfKingsDashboard {
                 <div class="match-teams">
                     ${teams.map(team => `
                         <div class="team ${team === winner ? 'winner' : ''}">
-                            <img src="${this.getTeamLogo(team)}" alt="${escapeHTML(team)}" class="team-logo" onerror="this.onerror=null;this.src='assets/logos/default_logo.png'">
+                            <img src="${this.getTeamLogo(team)}" alt="${escapeHTML(team)}" class="team-logo" 
+                                 data-logo-managed="team" data-logo-retry-index="1"
+                                 onerror="window.handleTeamLogoError(this, '${escapeHTML(team)}')">
                             <span class="team-name">${escapeHTML(team)}</span>
                         </div>
                     `).join('')}
@@ -1613,7 +1628,9 @@ class HonorOfKingsDashboard {
 
         teamCard.innerHTML = `
             <div class="team-card-header">
-                <img src="${this.getTeamLogo(teamName)}" alt="${escapeHTML(teamName)}" class="team-card-logo" onerror="this.onerror=null;this.src='assets/logos/default_logo.png'">
+                <img src="${this.getTeamLogo(teamName)}" alt="${escapeHTML(teamName)}" class="team-card-logo" 
+                     data-logo-managed="team" data-logo-retry-index="1"
+                     onerror="window.handleTeamLogoError(this, '${escapeHTML(teamName)}')">
                 <h3 class="team-card-name">${escapeHTML(teamName)}</h3>
             </div>
             <div class="team-card-stats">
@@ -1684,7 +1701,9 @@ class HonorOfKingsDashboard {
         let content = `
             <div class="team-detail glass">
                 <div class="team-detail-header">
-                    <img src="${this.getTeamLogo(teamName)}" alt="${escapeHTML(teamName)}" class="team-detail-logo" onerror="this.onerror=null;this.src='assets/logos/default_logo.png'">
+                    <img src="${this.getTeamLogo(teamName)}" alt="${escapeHTML(teamName)}" class="team-detail-logo" 
+                         data-logo-managed="team" data-logo-retry-index="1"
+                         onerror="window.handleTeamLogoError(this, '${escapeHTML(teamName)}')">
                     <div>
                         <h3 class="team-detail-name">${escapeHTML(teamName)}</h3>
                         <p>Victorias: ${this.getTeamWins(teamName)}</p>
@@ -2687,10 +2706,59 @@ class HonorOfKingsDashboard {
         return null;
     }
 
+    // ============================================================
+    // TEAM LOGO - Centralized using TOURNAMENT_CONFIG
+    // ============================================================
     getTeamLogo(teamName) {
-        const cleanName = teamName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-        return `assets/logos/${cleanName}.png`;
+        const config = window.TOURNAMENT_CONFIG;
+        if (config && config.helpers && config.helpers.getTeamLogoCandidates) {
+            const candidates = config.helpers.getTeamLogoCandidates(teamName);
+            if (candidates && candidates.length > 0) {
+                return candidates[0]; // primer candidato (extensión preferida)
+            }
+        }
+        return 'assets/logos/default_logo.png';
     }
+
+    // Fallback controlado por extensiones (llamado desde window.handleTeamLogoError)
+    applyTeamLogoFallback(imgElement, teamName) {
+        if (!imgElement) return;
+
+        const config = window.TOURNAMENT_CONFIG;
+        if (!config || !config.helpers || !config.helpers.getTeamLogoCandidates) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+
+        const candidates = config.helpers.getTeamLogoCandidates(teamName);
+        if (!candidates || candidates.length === 0) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+
+        // Leer índice actual; si no existe, empezar en 1 (porque el primer candidato ya se usó en src)
+        let currentIndex = parseInt(imgElement.dataset.logoRetryIndex);
+        if (isNaN(currentIndex) || currentIndex < 1) {
+            currentIndex = 1;
+        }
+
+        // Si ya se probaron todos los candidatos, usar default
+        if (currentIndex >= candidates.length) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            imgElement.dataset.logoRetryIndex = candidates.length + 1;
+            return;
+        }
+
+        // Probar el siguiente candidato
+        imgElement.src = candidates[currentIndex];
+        imgElement.dataset.logoRetryIndex = currentIndex + 1;
+        // El onerror ya está configurado para llamar a esta función de nuevo
+    }
+
+    // ------------------------------------------------------------
 
     getPlayerImage(playerName) {
         const cleanName = playerName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
@@ -2932,7 +3000,9 @@ class HonorOfKingsDashboard {
                 <div class="presentation-card glass best-team">
                     <h2 class="best-team-title" style="color: var(--primary-yellow); margin-bottom: 1rem;">🏆 Mejor Equipo del Torneo 🏆</h2>
                     <div class="presentation-team">
-                        <img src="${this.getTeamLogo(this.bestTeam.name)}" alt="${escapeHTML(this.bestTeam.name)}" class="presentation-team-logo" onerror="this.onerror=null;this.src='assets/logos/default_logo.png'">
+                        <img src="${this.getTeamLogo(this.bestTeam.name)}" alt="${escapeHTML(this.bestTeam.name)}" class="presentation-team-logo" 
+                             data-logo-managed="team" data-logo-retry-index="1"
+                             onerror="window.handleTeamLogoError(this, '${escapeHTML(this.bestTeam.name)}')">
                         <h3>${escapeHTML(this.bestTeam.name)}</h3>
                         <p>Victorias: ${this.bestTeam.wins}</p>
                         <div class="presentation-team-stats">
@@ -2986,16 +3056,25 @@ class HonorOfKingsDashboard {
 }
 
 // Initialize dashboard when DOM is ready
-document.addEventListener('DOMContentLoaded', () => { new HonorOfKingsDashboard(); });
+document.addEventListener('DOMContentLoaded', () => {
+    window.dashboard = new HonorOfKingsDashboard();
+});
 
-// Global image fallback handler
+// Global image fallback handler – modificado para ignorar logos de equipo manejados por el nuevo sistema
 window.addEventListener('error', (e) => {
     const image = e.target;
     if (!(image instanceof HTMLImageElement)) return;
-    if (!image.src || !image.src.includes('assets/logos/')) return;
-    if (image.dataset.fallbackApplied === 'true') return;
-    image.dataset.fallbackApplied = 'true';
-    image.src = 'assets/logos/default_logo.png';
+    const src = image.src || '';
+    if (src.includes('default_logo.png')) return;
+    // Si es un logo de equipo administrado, no intervenir (ya lo maneja nuestro fallback)
+    if (image.dataset.logoManaged === 'team') {
+        return;
+    }
+    if (src.includes('assets/logos/') || src.includes('assets/players/')) {
+        image.dataset.fallbackApplied = 'true';
+        image.src = 'assets/logos/default_logo.png';
+        image.onerror = null;
+    }
 }, true);
 
 window.HOK_CSV_LOADER = { resolvePhaseId: resolvePhaseId, loadPhaseCsvFiles: loadPhaseCsvFiles };

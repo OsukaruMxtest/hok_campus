@@ -20,6 +20,19 @@ function escapeHTML(str) {
   return String(str).replace(/[&<>"']/g, function(m) { return map[m]; });
 }
 
+// ============================================================
+// GLOBAL TEAM LOGO FALLBACK (para imágenes de equipo)
+// ============================================================
+window.handleTeamLogoError = function(img, teamName) {
+    if (img.dataset.logoManaged === 'team' && window.statsPage && typeof window.statsPage.applyTeamLogoFallback === 'function') {
+        window.statsPage.applyTeamLogoFallback(img, teamName);
+        return;
+    }
+    img.src = 'assets/logos/default_logo.png';
+    img.onerror = null;
+};
+// ============================================================
+
 // Parser CSV robusto con soporte para comillas, comas escapadas y BOM
 function parseCSV(csvText) {
   if (!csvText || typeof csvText !== 'string') return [];
@@ -97,6 +110,39 @@ function parseCSV(csvText) {
   }
   return data;
 }
+
+// ============================================================
+// INYECCIÓN DE ESTILOS PARA LOGOS EN ESTADÍSTICAS
+// ============================================================
+(function injectStatsStyles() {
+  if (document.getElementById('hok-stats-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'hok-stats-styles';
+  style.textContent = `
+    .hok-stats-team-logo {
+      width: 28px;
+      height: 28px;
+      margin-right: 8px;
+      vertical-align: middle;
+      border-radius: 50%;
+      object-fit: cover;
+      background-color: rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+    .ranking-card-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .presentation-card h4 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  `;
+  document.head.appendChild(style);
+})();
 
 class StatsPage {
     constructor() {
@@ -389,6 +435,47 @@ class StatsPage {
         const g = parseInt(hex.substring(2, 4), 16);
         const b = parseInt(hex.substring(4, 6), 16);
         return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    // ================================================================
+
+    // ================== HELPERS PARA LOGOS DE EQUIPOS ==================
+    getTeamLogo(teamName) {
+        const config = window.TOURNAMENT_CONFIG;
+        if (config && config.helpers && typeof config.helpers.getTeamLogoCandidates === 'function') {
+            const candidates = config.helpers.getTeamLogoCandidates(teamName);
+            if (candidates && candidates.length > 0) {
+                return candidates[0];
+            }
+        }
+        return 'assets/logos/default_logo.png';
+    }
+
+    applyTeamLogoFallback(imgElement, teamName) {
+        if (!imgElement) return;
+        const config = window.TOURNAMENT_CONFIG;
+        if (!config || !config.helpers || typeof config.helpers.getTeamLogoCandidates !== 'function') {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+        const candidates = config.helpers.getTeamLogoCandidates(teamName);
+        if (!candidates || candidates.length === 0) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            return;
+        }
+        let currentIndex = parseInt(imgElement.dataset.logoRetryIndex);
+        if (isNaN(currentIndex) || currentIndex < 1) {
+            currentIndex = 1;
+        }
+        if (currentIndex >= candidates.length) {
+            imgElement.src = 'assets/logos/default_logo.png';
+            imgElement.onerror = null;
+            imgElement.dataset.logoRetryIndex = candidates.length + 1;
+            return;
+        }
+        imgElement.src = candidates[currentIndex];
+        imgElement.dataset.logoRetryIndex = currentIndex + 1;
     }
     // ================================================================
 
@@ -1694,9 +1781,20 @@ class StatsPage {
                 const val = t['total_' + firstSum.key] || 0;
                 statsHtml += `<span>${firstSum.label}: ${this.formatNumber(Math.round(val))}</span>`;
             }
+
+            const logoSrc = this.getTeamLogo(t.name);
+            const escapedName = escapeHTML(t.name);
+
             html += `
                 <div class="ranking-card glass ${cls}" role="listitem">
-                    <div class="ranking-card-header">${medal} ${escapeHTML(t.name)}</div>
+                    <div class="ranking-card-header">
+                        <img class="hok-stats-team-logo" src="${logoSrc}" alt="${escapedName}" 
+                             data-team="${escapedName}"
+                             data-logo-managed="team"
+                             data-logo-retry-index="1"
+                             onerror="window.handleTeamLogoError(this, '${escapedName}')" />
+                        ${medal} ${escapedName}
+                    </div>
                     <div class="ranking-card-stats">${statsHtml}</div>
                 </div>
             `;
@@ -1866,12 +1964,23 @@ class StatsPage {
                 <div class="presentation-teams">
                     <h3>🏅 Top 3 Equipos</h3>
                     <div class="presentation-grid">
-                        ${topTeams.map(t => `
+                        ${topTeams.map(t => {
+                            const logoSrc = this.getTeamLogo(t.name);
+                            const escapedName = escapeHTML(t.name);
+                            return `
                             <div class="presentation-card glass">
-                                <h4>${escapeHTML(t.name)}</h4>
+                                <h4>
+                                    <img class="hok-stats-team-logo" src="${logoSrc}" alt="${escapedName}" 
+                                         data-team="${escapedName}"
+                                         data-logo-managed="team"
+                                         data-logo-retry-index="1"
+                                         style="width:24px;height:24px;border-radius:50%;object-fit:cover;margin-right:6px;"
+                                         onerror="window.handleTeamLogoError(this, '${escapedName}')" />
+                                    ${escapedName}
+                                </h4>
                                 <p>Victorias: ${t.wins}${this.isMetricEnabled('kills') ? ' | KDA: '+t.kda : ''}</p>
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
                 </div>
         `;
@@ -2100,4 +2209,23 @@ class StatsPage {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => { new StatsPage(); });
+document.addEventListener('DOMContentLoaded', () => {
+    window.statsPage = new StatsPage();
+});
+
+// Fallback global de imágenes – modificado para ignorar logos de equipo administrados
+window.addEventListener('error', (e) => {
+    const image = e.target;
+    if (!(image instanceof HTMLImageElement)) return;
+    // Ignorar imágenes administradas (logos de equipo)
+    if (image.dataset.logoManaged === 'team') {
+        return;
+    }
+    const src = image.src || '';
+    if (src.includes('default_logo.png')) return;
+    if (src.includes('assets/logos/') || src.includes('assets/players/')) {
+        image.dataset.fallbackApplied = 'true';
+        image.src = 'assets/logos/default_logo.png';
+        image.onerror = null;
+    }
+}, true);

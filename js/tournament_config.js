@@ -52,7 +52,20 @@
       '#FB5607',
       '#06D6A0',
       '#FF70A6'
-    ]
+    ],
+    // ----- CONFIGURACIÓN PARA LOGOS DE EQUIPOS POR PAÍS -----
+    teamLogoBasePath: 'assets/logos/teams/',
+    teamLogoExtensions: ['png', 'jpeg', 'jpg', 'webp', 'svg'],
+    teamCountryMap: {
+      'Team Franzero': 'cl',
+      'Team Carol': 'pe',
+      'Team Creador 150': 'mx',
+      'Team Matute': 'ar',
+      'Team Annie': 'co',
+      'Team Boomking': 'ec',
+      'Team Naomi': 'uy',
+      'Team Ylane': 'bo'
+    }
   };
 
   // ============================================================
@@ -367,7 +380,7 @@
       return numericValue;
     },
 
-    // ----- nuevos helpers para bracket -----
+    // ----- helpers para bracket -----
     getBracketRound: function (roundId) {
       return CONFIG.bracket.rounds[roundId] || null;
     },
@@ -391,7 +404,7 @@
       return path.indexOf('../') === 0 ? path.slice(3) : path;
     },
 
-    // ----- nuevo helper para colores de equipos -----
+    // ----- helper para colores de equipos -----
     getTeamColor: function (teamName, teamList) {
       var colors = CONFIG.ui.teamColors || [];
       var index = Array.isArray(teamList) ? teamList.indexOf(teamName) : -1;
@@ -399,7 +412,7 @@
       return colors[index % colors.length];
     },
 
-    // ----- nuevo helper para métricas habilitadas -----
+    // ----- helper para métricas habilitadas -----
     getEnabledStatMetrics: function () {
       var metrics = [];
       var fiveEnabled = window.isModo5v5Enabled ? window.isModo5v5Enabled() : false;
@@ -412,6 +425,81 @@
         metrics = metrics.concat(CONFIG.statMetrics.modo_chaos || []);
       }
       return metrics;
+    },
+
+    // ============================================================
+    //  NUEVOS HELPERS PARA LOGOS DE EQUIPOS POR PAÍS (robustos)
+    // ============================================================
+
+    /**
+     * Normaliza un nombre de equipo para comparación:
+     * - Convierte a string.
+     * - Recorta espacios.
+     * - Reemplaza múltiples espacios internos por uno solo.
+     * - Pasa a minúsculas.
+     * - Elimina acentos (diacríticos).
+     */
+    normalizeTeamLogoKey: function (teamName) {
+      if (!teamName) return '';
+      return String(teamName)
+        .trim()
+        .replace(/\s+/g, ' ')          // múltiples espacios → uno solo
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, ''); // elimina acentos
+    },
+
+    /**
+     * Devuelve un arreglo con las rutas candidatas para el logo del equipo.
+     * Primero intenta coincidencia exacta; si falla, usa la comparación normalizada.
+     * @param {string} teamName - Nombre del equipo (puede tener variaciones).
+     * @returns {string[]} Lista de rutas de imagen (sin validación de existencia).
+     */
+    getTeamLogoCandidates: function (teamName) {
+      var defaultLogo = CONFIG.ui.defaultLogo;
+      var map = CONFIG.ui.teamCountryMap;
+      var basePath = CONFIG.ui.teamLogoBasePath;
+      var extensions = CONFIG.ui.teamLogoExtensions || ['png', 'jpeg', 'jpg', 'webp', 'svg'];
+
+      if (!teamName) {
+        return [defaultLogo];
+      }
+
+      var normalizedInput = this.normalizeTeamLogoKey(teamName);
+
+      // Buscar coincidencia exacta primero
+      var code = map[teamName];
+
+      // Si no, buscar por clave normalizada
+      if (!code) {
+        for (var key in map) {
+          if (Object.prototype.hasOwnProperty.call(map, key)) {
+            var normalizedKey = this.normalizeTeamLogoKey(key);
+            if (normalizedKey === normalizedInput) {
+              code = map[key];
+              break;
+            }
+          }
+        }
+      }
+
+      // Si se encontró un código, generar candidatos
+      if (code) {
+        return extensions.map(function (ext) {
+          return basePath + code + '.' + ext;
+        });
+      }
+
+      // Fallback: logo por defecto
+      return [defaultLogo];
+    },
+
+    /**
+     * Devuelve la ruta del logo por defecto definida en la configuración.
+     * @returns {string}
+     */
+    getDefaultLogo: function () {
+      return CONFIG.ui.defaultLogo;
     }
   };
 
