@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copa HOK LATAM - Sorteo Semifinales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --hok-gold: #cfa559;
+      --hok-gold-2: #dac297;
+      --hok-bronze: #7f675b;
+      --hok-orange: #d9a05b;
+      --hok-bg: #09070f;
+      --hok-bg-2: #17111f;
+      --hok-card: rgba(255, 255, 255, 0.075);
+      --hok-border: rgba(218, 194, 151, 0.28);
+      --text-main: #ffffff;
+      --text-muted: #d8c9b5;
+      --danger: #ff6b4a;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      --font-heading: 'Poppins', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font-body);
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at top left, rgba(207, 165, 89, 0.25), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(217, 160, 91, 0.18), transparent 32%),
+        linear-gradient(135deg, var(--hok-bg), var(--hok-bg-2));
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 78%);
+      pointer-events: none;
+    }
+
+    .page {
+      width: min(1360px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 26px;
+      border: 1px solid var(--hok-border);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.035));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2.4rem, 6vw, 5.4rem);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      color: var(--text-main);
+      text-shadow: 0 0 24px rgba(207, 165, 89, 0.32);
+    }
+
+    .controls {
+      margin: 22px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: #100d08;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, var(--hok-gold-2), var(--hok-gold), var(--hok-orange));
+      box-shadow: 0 12px 36px rgba(207, 165, 89, 0.26);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 16px 44px rgba(207,165,89,0.34); }
+    button:active:not(:disabled) { transform: translateY(0); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+    .btn-ghost {
+      color: var(--hok-gold-2);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--hok-border);
+      box-shadow: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel, .bracket-stage {
+      border: 1px solid var(--hok-border);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.035));
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .team-list { display: grid; gap: 10px; padding: 16px; }
+
+    .team-pill {
+      position: relative;
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 12px;
+      align-items: center;
+      height: 76px;
+      min-height: 76px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(218,194,151,0.18);
+      background: rgba(0,0,0,0.22);
+      overflow: hidden;
+      transition: opacity 0.3s ease, border-color 0.3s ease;
+    }
+
+    .team-pill.is-used {
+      opacity: 0.42;
+      border-color: rgba(255, 107, 74, 0.36);
+    }
+
+    .team-pill.is-used::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 8px;
+      height: 3px;
+      width: calc(100% - 16px);
+      background: linear-gradient(90deg, transparent, var(--danger), transparent);
+      transform: translateY(-50%) scaleX(0);
+      transform-origin: left;
+      animation: strikeTeam 0.42s ease forwards;
+    }
+
+    .team-pill.is-qualified {
+      border-color: rgba(207, 165, 89, 0.76);
+      background: linear-gradient(135deg, rgba(207,165,89,0.18), rgba(0,0,0,0.22));
+      box-shadow: 0 0 24px rgba(207,165,89,0.14);
+    }
+
+    .team-pill:not(.is-qualified) {
+      opacity: 0.42;
+    }
+
+    @keyframes strikeTeam {
+      to { transform: translateY(-50%) scaleX(1); }
+    }
+
+    .flag {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.08);
+      font-size: 1.7rem;
+      box-shadow: inset 0 0 18px rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+
+    .flag img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .rep {
+      font-weight: 800;
+      font-family: var(--font-heading);
+      line-height: 1.15;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .country {
+      margin-top: 3px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bracket-stage { min-height: 650px; }
+
+    .stage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--hok-border);
+      background: linear-gradient(135deg, rgba(207,165,89,0.18), rgba(255,255,255,0.03));
+    }
+
+    .stage-header h2 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .stage-header p {
+      margin-top: 6px;
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .round-label {
+      color: var(--hok-gold-2);
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+
+    .matches {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 22px;
+    }
+
+    .match-card {
+      position: relative;
+      height: 246px;
+      min-height: 246px;
+      border: 1px solid rgba(218,194,151,0.26);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(207,165,89,0.11), rgba(0,0,0,0.18)),
+        rgba(255,255,255,0.045);
+      overflow: hidden;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: matchIn 0.45s ease forwards;
+    }
+
+    .match-card.is-active {
+      border-color: rgba(218, 194, 151, 0.72);
+      box-shadow: 0 0 34px rgba(207,165,89,0.20);
+    }
+
+    .match-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(218,194,151,0.18), transparent 52%);
+      pointer-events: none;
+    }
+
+    @keyframes matchIn { to { transform: translateY(0); opacity: 1; } }
+
+    .match-title {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      font-family: var(--font-heading);
+      font-weight: 900;
+      color: var(--hok-gold-2);
+      border-bottom: 1px solid rgba(218,194,151,0.22);
+      background: rgba(0,0,0,0.22);
+    }
+
+    .bo3 { color: var(--text-muted); font-size: 0.78rem; letter-spacing: 0.08em; }
+
+    .match-body {
+      position: relative;
+      z-index: 1;
+      height: 188px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
+    .competitor {
+      height: 150px;
+      min-height: 150px;
+      max-height: 150px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
+    }
+
+    .competitor.is-rolling {
+      border-color: rgba(218, 194, 151, 0.85);
+      background: rgba(207, 165, 89, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(218,194,151,0.25), 0 0 22px rgba(207,165,89,0.18);
+    }
+
+    .competitor.is-picked {
+      border-color: rgba(207, 165, 89, 0.72);
+      background: linear-gradient(135deg, rgba(207,165,89,0.15), rgba(0,0,0,0.22));
+    }
+
+    .competitor .flag {
+      width: 62px;
+      height: 62px;
+      min-width: 62px;
+      min-height: 62px;
+      font-size: 2.25rem;
+      margin-bottom: 12px;
+      flex: 0 0 auto;
+    }
+
+    .competitor .rep {
+      width: 100%;
+      min-height: 44px;
+      max-height: 44px;
+      font-size: clamp(0.92rem, 1.25vw, 1.12rem);
+    }
+
+    .competitor .country {
+      width: 100%;
+      min-height: 20px;
+      font-weight: 700;
+      color: var(--hok-gold-2);
+    }
+
+    .placeholder .flag { opacity: 0.35; }
+    .placeholder .rep, .placeholder .country { color: rgba(255,255,255,0.42); }
+
+    .versus {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #120f09;
+      background: linear-gradient(135deg, var(--hok-gold-2), var(--hok-gold));
+      font-family: var(--font-heading);
+      font-weight: 900;
+      align-self: center;
+      justify-self: center;
+      box-shadow: 0 10px 28px rgba(207,165,89,0.3);
+    }
+
+    .export-area {
+      background: var(--hok-bg);
+      border-radius: var(--radius-lg);
+    }
+
+
+
+    /* Modo especial para exportación: html2canvas no siempre respeta bien
+       animaciones, transparencias y backdrop-filter. Esta clase fuerza una
+       versión sólida y estable solo para la captura. */
+    .export-capture,
+    .export-capture * {
+      animation: none !important;
+      transition: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    .export-capture {
+      position: fixed !important;
+      left: -10000px !important;
+      top: 0 !important;
+      width: 1040px !important;
+      min-height: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+      background:
+        radial-gradient(circle at top left, rgba(207, 165, 89, 0.22), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(217, 160, 91, 0.16), transparent 34%),
+        linear-gradient(135deg, #09070f, #17111f) !important;
+      box-shadow: none !important;
+    }
+
+    .export-capture .matches {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      overflow: visible !important;
+    }
+
+    .export-capture .match-card {
+      opacity: 1 !important;
+      transform: none !important;
+      background:
+        linear-gradient(135deg, rgba(207,165,89,0.18), rgba(0,0,0,0.28)),
+        #17111f !important;
+    }
+
+    .export-capture .panel,
+    .export-capture .bracket-stage,
+    .export-capture .competitor,
+    .export-capture .stage-header {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    @media (max-width: 1024px) {
+      .layout { grid-template-columns: 1fr; }
+      .team-list { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .page { width: min(100% - 24px, 1360px); padding-top: 18px; }
+      .matches { grid-template-columns: 1fr; padding: 14px; }
+      .match-body { grid-template-columns: 1fr; }
+      .versus { margin: -4px auto; }
+      .team-list { grid-template-columns: 1fr; }
+      .controls { align-items: stretch; }
+      .buttons, button { width: 100%; }
+      .stage-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero" aria-label="Copa HOK LATAM">
+      <h1>Copa HOK LATAM</h1>
+    </section>
+
+    <section class="controls" aria-label="Controles">
+      <div class="buttons">
+        <button type="button" id="generateBtn">Generar Semifinales</button>
+        <button type="button" class="btn-ghost" id="resetBtn">Reiniciar</button>
+        <button type="button" class="btn-ghost" id="exportBtn">Exportar imagen</button>
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel" aria-label="Equipos participantes">
+        <div class="team-list" id="teamList"></div>
+      </aside>
+
+      <section class="bracket-stage export-area" id="captureArea" aria-label="Llaves generadas">
+        <div class="stage-header">
+          <div>
+            <h2>Semifinales</h2>
+            <p>Standard 5v5 · Series al mejor de 3 partidas</p>
+          </div>
+          <div class="round-label">Copa HOK LATAM</div>
+        </div>
+        <div class="matches" id="matchesContainer"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const TEAM_ASSET_CONFIG = {
+      teamLogoBasePath: 'assets/logos/teams/',
+      teamLogoExtensions: ['png', 'jpeg', 'jpg', 'webp', 'svg'],
+      teamCountryMap: {
+        'Team Franzero': 'cl',
+        'Team Carol': 'pe',
+        'Team Creador 150': 'mx',
+        'Team Matute': 'ar',
+        'Team Annie': 'co',
+        'Team Boomking': 'ec',
+        'Team Naomi': 'uy',
+        'Team Ylane': 'bo'
+      }
+    };
+
+    const COUNTRY_META = {
+      cl: { country: 'Chile', flagText: '🇨🇱' },
+      pe: { country: 'Perú', flagText: '🇵🇪' },
+      mx: { country: 'México', flagText: '🇲🇽' },
+      ar: { country: 'Argentina', flagText: '🇦🇷' },
+      co: { country: 'Colombia', flagText: '🇨🇴' },
+      ec: { country: 'Ecuador', flagText: '🇪🇨' },
+      uy: { country: 'Uruguay', flagText: '🇺🇾' },
+      bo: { country: 'Bolivia', flagText: '🇧🇴' }
+    };
+
+    const TEAMS = [
+      createTeam('team1', 'Team Carol'),
+      createTeam('team2', 'Team Naomi'),
+      createTeam('team3', 'Team Creador 150'),
+      createTeam('team4', 'Team Annie'),
+      createTeam('team5', 'Team Boomking'),
+      createTeam('team6', 'Team Franzero'),
+      createTeam('team7', 'Team Matute'),
+      createTeam('team8', 'Team Ylane')
+    ];
+
+    // Modificar únicamente estas 4 variables cuando se confirmen los clasificados.
+    // Valores disponibles: 'team1', 'team2', 'team3', 'team4', 'team5', 'team6', 'team7', 'team8'.
+    const SEMIFINAL_CONFIG = {
+      v1: 'team1',
+      v2: 'team3',
+      v3: 'team5',
+      v4: 'team8'
+    };
+
+    const PICK_DURATION_MS = 3000;
+    const ROLL_INTERVAL_MS = 70;
+    const FLAG_EXTENSIONS = TEAM_ASSET_CONFIG.teamLogoExtensions;
+
+    const flagAssetCache = new Map();
+
+    let selectedBySlot = Array(4).fill(null);
+    let currentMatches = [];
+    let isGenerating = false;
+    let rollingIntervals = [];
+
+    const teamList = document.getElementById('teamList');
+    const matchesContainer = document.getElementById('matchesContainer');
+    const generateBtn = document.getElementById('generateBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const exportBtn = document.getElementById('exportBtn');
+
+    function createTeam(key, representative) {
+      const countryCode = TEAM_ASSET_CONFIG.teamCountryMap[representative];
+      const meta = COUNTRY_META[countryCode] || { country: 'Por definir', flagText: '🏳️' };
+
+      return {
+        key,
+        id: key,
+        representative,
+        country: meta.country,
+        countryCode,
+        flagText: meta.flagText,
+        flagBase: countryCode ? `${TEAM_ASSET_CONFIG.teamLogoBasePath}${countryCode}` : null
+      };
+    }
+
+    function renderTeamList() {
+      const semifinalTeams = getSemifinalTeams();
+
+      teamList.innerHTML = semifinalTeams.map(team => `
+        <article class="team-pill is-qualified" id="team-pill-${team.id}">
+          ${renderFlag(team)}
+          <div>
+            <div class="rep">${escapeHtml(team.representative)}</div>
+            <div class="country">${escapeHtml(team.country)}</div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderEmptyMatches() {
+      selectedBySlot = Array(4).fill(null);
+      currentMatches = [];
+      matchesContainer.innerHTML = Array.from({ length: 2 }, (_, index) => `
+        <article class="match-card" id="match-${index}" style="animation-delay: ${index * 90}ms">
+          <div class="match-title">
+            <span>Semifinal ${index + 1}</span>
+            <span class="bo3">BO3</span>
+          </div>
+          <div class="match-body">
+            ${renderCompetitor(null, getSlotId(index, 0))}
+            <div class="versus">VS</div>
+            ${renderCompetitor(null, getSlotId(index, 1))}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function renderCompetitor(team, slotId) {
+      if (!team) {
+        return `
+          <div class="competitor placeholder" id="${slotId}">
+            <div class="flag" aria-hidden="true">—</div>
+            <div class="rep">Pendiente</div>
+            <div class="country">—</div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="competitor is-picked" id="${slotId}">
+          ${renderFlag(team)}
+          <div class="rep">${escapeHtml(team.representative)}</div>
+          <div class="country">${escapeHtml(team.country)}</div>
+        </div>
+      `;
+    }
+
+    function renderFlag(team) {
+      const alt = `Bandera de ${team.country}`;
+      const cachedSrc = flagAssetCache.get(team.id);
+
+      if (cachedSrc) {
+        return `
+          <div class="flag" aria-hidden="true">
+            <img src="${escapeHtml(cachedSrc)}" alt="${escapeHtml(alt)}">
+          </div>
+        `;
+      }
+
+      return `
+        <div class="flag flag-fallback" aria-hidden="true">
+          ${escapeHtml(team.flagText)}
+        </div>
+      `;
+    }
+
+    function preloadFlagAssets() {
+      return Promise.all(TEAMS.map(async team => {
+        const src = team.flagBase ? await resolveFlagAsset(team.flagBase) : null;
+        flagAssetCache.set(team.id, src);
+      }));
+    }
+
+    function resolveFlagAsset(flagBase) {
+      return new Promise(resolve => {
+        let index = 0;
+
+        function tryNextExtension() {
+          if (index >= FLAG_EXTENSIONS.length) {
+            resolve(null);
+            return;
+          }
+
+          const src = `${flagBase}.${FLAG_EXTENSIONS[index]}`;
+          const image = new Image();
+
+          image.onload = () => resolve(src);
+          image.onerror = () => {
+            index += 1;
+            tryNextExtension();
+          };
+
+          image.src = src;
+        }
+
+        tryNextExtension();
+      });
+    }
+
+    function getSlotId(matchIndex, sideIndex) {
+      return `slot-${matchIndex}-${sideIndex}`;
+    }
+
+    function getTeamByKey(teamKey) {
+      return TEAMS.find(team => team.key === teamKey) || null;
+    }
+
+    function getSemifinalTeams() {
+      const configuredKeys = [SEMIFINAL_CONFIG.v1, SEMIFINAL_CONFIG.v2, SEMIFINAL_CONFIG.v3, SEMIFINAL_CONFIG.v4];
+      const teams = configuredKeys.map(getTeamByKey).filter(Boolean);
+      const uniqueIds = new Set(teams.map(team => team.id));
+
+      if (teams.length !== 4 || uniqueIds.size !== 4) {
+        console.error('[Sorteo semifinales] Configuración inválida. Revisa v1, v2, v3 y v4:', SEMIFINAL_CONFIG);
+        return [];
+      }
+
+      return teams;
+    }
+
+    function isSemifinalist(team) {
+      return Object.values(SEMIFINAL_CONFIG).includes(team.key);
+    }
+
+    function getAvailableTeams() {
+      const usedIds = new Set(selectedBySlot.filter(Boolean).map(team => team.id));
+      return getSemifinalTeams().filter(team => !usedIds.has(team.id));
+    }
+
+    function randomFrom(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function shuffleList(list) {
+      return [...list].sort(() => Math.random() - 0.5);
+    }
+
+    function buildVisualRollingPool(realPool) {
+      const visualPool = realPool.length ? realPool : getSemifinalTeams();
+
+      if (visualPool.length <= 1) {
+        return visualPool;
+      }
+
+      return shuffleList(visualPool);
+    }
+
+    function startRollingSlot(slotElement, realPool) {
+      const visualPool = buildVisualRollingPool(realPool);
+      let rollingIndex = Math.floor(Math.random() * visualPool.length);
+      let lastTeamId = null;
+
+      const intervalId = setInterval(() => {
+        if (!visualPool.length) return;
+
+        let team = visualPool[rollingIndex % visualPool.length];
+        rollingIndex += 1;
+
+        if (visualPool.length > 1 && team.id === lastTeamId) {
+          team = visualPool[rollingIndex % visualPool.length];
+          rollingIndex += 1;
+        }
+
+        lastTeamId = team.id;
+        setSlotRolling(slotElement, team);
+      }, ROLL_INTERVAL_MS);
+
+      rollingIntervals.push(intervalId);
+      return intervalId;
+    }
+
+    function stopRollingSlot(intervalId) {
+      clearInterval(intervalId);
+      rollingIntervals = rollingIntervals.filter(id => id !== intervalId);
+    }
+
+    function markTeamUsed(team) {
+      const item = document.getElementById(`team-pill-${team.id}`);
+      if (item) item.classList.add('is-used');
+    }
+
+    function setMatchActive(matchIndex, isActive) {
+      const card = document.getElementById(`match-${matchIndex}`);
+      if (card) card.classList.toggle('is-active', isActive);
+    }
+
+    function setSlotRolling(slotElement, team) {
+      slotElement.classList.remove('placeholder', 'is-picked');
+      slotElement.classList.add('is-rolling');
+      slotElement.innerHTML = `
+        ${renderFlag(team)}
+        <div class="rep">${escapeHtml(team.representative)}</div>
+        <div class="country">${escapeHtml(team.country)}</div>
+      `;
+    }
+
+    function setSlotPicked(slotElement, team) {
+      slotElement.classList.remove('placeholder', 'is-rolling');
+      slotElement.classList.add('is-picked');
+      slotElement.innerHTML = `
+        ${renderFlag(team)}
+        <div class="rep">${escapeHtml(team.representative)}</div>
+        <div class="country">${escapeHtml(team.country)}</div>
+      `;
+    }
+
+    function animatePick(slotIndex, pool, reservedIds = new Set()) {
+      return new Promise(resolve => {
+        const matchIndex = Math.floor(slotIndex / 2);
+        const sideIndex = slotIndex % 2;
+        const slotElement = document.getElementById(getSlotId(matchIndex, sideIndex));
+        const usablePool = pool.filter(team => !reservedIds.has(team.id));
+
+        if (!slotElement || usablePool.length === 0) {
+          resolve(null);
+          return;
+        }
+
+        setMatchActive(matchIndex, true);
+        generateBtn.disabled = true;
+        resetBtn.disabled = true;
+        exportBtn.disabled = true;
+
+        const intervalId = startRollingSlot(slotElement, usablePool);
+
+        setTimeout(() => {
+          stopRollingSlot(intervalId);
+
+          const finalTeam = randomFrom(usablePool);
+          selectedBySlot[slotIndex] = finalTeam;
+          setSlotPicked(slotElement, finalTeam);
+          markTeamUsed(finalTeam);
+          setMatchActive(matchIndex, false);
+          resolve(finalTeam);
+        }, PICK_DURATION_MS);
+      });
+    }
+
+    async function generateMatchesAnimated() {
+      if (isGenerating) return;
+
+      const semifinalTeams = getSemifinalTeams();
+      if (semifinalTeams.length !== 4) {
+        alert('Configuración inválida. Revisa que v1, v2, v3 y v4 tengan 4 equipos diferentes.');
+        return;
+      }
+
+      isGenerating = true;
+      resetAll(false);
+      generateBtn.disabled = true;
+      resetBtn.disabled = true;
+      exportBtn.disabled = true;
+
+      const randomizedSlots = shuffleList(semifinalTeams);
+
+      const firstWave = [
+        { slotIndex: 0, team: randomizedSlots[0] },
+        { slotIndex: 2, team: randomizedSlots[1] }
+      ];
+
+      const secondWaveTeams = randomizedSlots.slice(2);
+      const secondWave = [
+        { slotIndex: 1, team: secondWaveTeams[0] },
+        { slotIndex: 3, team: secondWaveTeams[1] }
+      ];
+
+      setMatchActive(0, true);
+      setMatchActive(1, true);
+
+      await Promise.all(firstWave.map(pick =>
+        animatePickWithForcedResult(pick.slotIndex, semifinalTeams, pick.team)
+      ));
+
+      await wait(450);
+
+      const remainingTeams = semifinalTeams.filter(team =>
+        !firstWave.some(pick => pick.team.id === team.id)
+      );
+
+      await Promise.all(secondWave.map(pick =>
+        animatePickWithForcedResult(pick.slotIndex, remainingTeams, pick.team)
+      ));
+
+      setMatchActive(0, false);
+      setMatchActive(1, false);
+
+      currentMatches = [
+        { teamA: selectedBySlot[0], teamB: selectedBySlot[1] },
+        { teamA: selectedBySlot[2], teamB: selectedBySlot[3] }
+      ];
+
+      isGenerating = false;
+      generateBtn.disabled = false;
+      resetBtn.disabled = false;
+      exportBtn.disabled = false;
+    }
+
+    function animatePickWithForcedResult(slotIndex, pool, finalTeam) {
+      return new Promise(resolve => {
+        const matchIndex = Math.floor(slotIndex / 2);
+        const sideIndex = slotIndex % 2;
+        const slotElement = document.getElementById(getSlotId(matchIndex, sideIndex));
+
+        if (!slotElement || !finalTeam) {
+          resolve(null);
+          return;
+        }
+
+        setMatchActive(matchIndex, true);
+
+        const intervalId = startRollingSlot(slotElement, pool);
+
+        setTimeout(() => {
+          stopRollingSlot(intervalId);
+
+          selectedBySlot[slotIndex] = finalTeam;
+          setSlotPicked(slotElement, finalTeam);
+          markTeamUsed(finalTeam);
+          resolve(finalTeam);
+        }, PICK_DURATION_MS);
+      });
+    }
+
+    function resetAll(enableButtons = true) {
+      rollingIntervals.forEach(clearInterval);
+      rollingIntervals = [];
+      isGenerating = false;
+      selectedBySlot = Array(4).fill(null);
+      currentMatches = [];
+      renderTeamList();
+      renderEmptyMatches();
+
+      if (enableButtons) {
+        generateBtn.disabled = false;
+        resetBtn.disabled = false;
+        exportBtn.disabled = false;
+      }
+    }
+
+    async function exportImage() {
+      if (isGenerating || !currentMatches.length) return;
+      if (typeof html2canvas === 'undefined') {
+        alert('No se pudo cargar html2canvas. Revisa tu conexión o el script externo.');
+        return;
+      }
+
+      generateBtn.disabled = true;
+      resetBtn.disabled = true;
+      exportBtn.disabled = true;
+
+      let exportClone = null;
+
+      try {
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+        }
+
+        const captureArea = document.getElementById('captureArea');
+        exportClone = captureArea.cloneNode(true);
+        exportClone.id = 'captureAreaExportClone';
+        exportClone.classList.add('export-capture');
+        document.body.appendChild(exportClone);
+
+        await waitForImages(exportClone);
+        await wait(120);
+
+        const exportWidth = Math.ceil(exportClone.scrollWidth);
+        const exportHeight = Math.ceil(exportClone.scrollHeight);
+
+        const canvas = await html2canvas(exportClone, {
+          scale: 2,
+          width: exportWidth,
+          height: exportHeight,
+          windowWidth: exportWidth,
+          windowHeight: exportHeight,
+          backgroundColor: '#09070f',
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          imageTimeout: 0,
+          scrollX: 0,
+          scrollY: 0
+        });
+
+        const link = document.createElement('a');
+        link.download = 'semifinales-copa-hok-latam.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (error) {
+        console.error('Error al exportar imagen:', error);
+        alert('No se pudo exportar la imagen correctamente. Revisa la consola para más detalles.');
+      } finally {
+        if (exportClone && exportClone.parentNode) {
+          exportClone.parentNode.removeChild(exportClone);
+        }
+
+        generateBtn.disabled = false;
+        resetBtn.disabled = false;
+        exportBtn.disabled = false;
+      }
+    }
+
+    function waitForImages(root) {
+      const images = Array.from(root.querySelectorAll('img'));
+      if (!images.length) return Promise.resolve();
+
+      return Promise.all(images.map(img => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+
+        return new Promise(resolve => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        });
+      }));
+    }
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    async function initGenerator() {
+      generateBtn.disabled = true;
+      resetBtn.disabled = true;
+      exportBtn.disabled = true;
+
+      await preloadFlagAssets();
+      resetAll(true);
+    }
+
+    generateBtn.addEventListener('click', generateMatchesAnimated);
+    resetBtn.addEventListener('click', () => resetAll(true));
+    exportBtn.addEventListener('click', exportImage);
+
+    initGenerator();
+  </script>
+</body>
+</html>
