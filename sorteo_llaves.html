@@ -224,7 +224,7 @@
       text-overflow: ellipsis;
     }
 
-    .bracket-stage { min-height: 650px; }
+    .bracket-stage { min-height: 0; }
 
     .stage-header {
       display: flex;
@@ -259,10 +259,10 @@
     }
 
     .matches {
-      padding: 22px;
+      padding: 18px;
       display: grid;
       grid-template-columns: repeat(2, minmax(260px, 1fr));
-      gap: 22px;
+      gap: 18px;
     }
 
     .match-card {
@@ -398,6 +398,100 @@
       border-radius: var(--radius-lg);
     }
 
+    body.is-presenting .page,
+    body.is-presentation-exiting .page {
+      z-index: auto;
+    }
+
+    body.is-presenting::after,
+    body.is-presentation-exiting::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0, 0, 0, 0.72);
+      animation: presentationFadeIn 0.32s ease forwards;
+      pointer-events: none;
+    }
+
+    body.is-presenting .hero,
+    body.is-presenting .controls,
+    body.is-presenting .panel,
+    body.is-presentation-exiting .hero,
+    body.is-presentation-exiting .controls,
+    body.is-presentation-exiting .panel {
+      opacity: 0.18;
+      pointer-events: none;
+      transition: opacity 0.32s ease;
+    }
+
+    body.is-presenting .bracket-stage {
+      position: fixed;
+      left: var(--presentation-left, 50%);
+      top: var(--presentation-top, 50%);
+      z-index: 90;
+      width: var(--presentation-width, min(1180px, calc(100vw - 48px)));
+      min-height: 0;
+      transform: none;
+      transform-origin: top left;
+      border-color: rgba(218, 194, 151, 0.72);
+      box-shadow: 0 34px 120px rgba(0,0,0,0.78), 0 0 70px rgba(207,165,89,0.18);
+    }
+
+    body.is-presenting .bracket-stage .stage-header {
+      padding: 24px 28px;
+    }
+
+    body.is-presenting .bracket-stage .matches {
+      padding: 30px;
+      gap: 30px;
+    }
+
+    body.is-presenting .bracket-stage .match-card {
+      height: 330px;
+      min-height: 330px;
+      border-color: rgba(218, 194, 151, 0.72);
+      box-shadow: 0 0 36px rgba(207,165,89,0.16);
+    }
+
+    body.is-presenting .bracket-stage .match-body {
+      height: 268px;
+      padding: 26px;
+      gap: 20px;
+    }
+
+    body.is-presenting .bracket-stage .competitor {
+      height: 210px;
+      min-height: 210px;
+      max-height: 210px;
+      padding: 22px 16px;
+    }
+
+    body.is-presenting .bracket-stage .competitor .flag {
+      width: 86px;
+      height: 86px;
+      min-width: 86px;
+      min-height: 86px;
+      margin-bottom: 16px;
+    }
+
+    body.is-presenting .bracket-stage .competitor .rep {
+      font-size: clamp(1.08rem, 1.55vw, 1.36rem);
+      min-height: 52px;
+      max-height: 52px;
+    }
+
+    body.is-presenting .bracket-stage .versus {
+      width: 68px;
+      height: 68px;
+      font-size: 1.15rem;
+    }
+
+    @keyframes presentationFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
 
 
     /* Modo especial para exportación: html2canvas no siempre respeta bien
@@ -461,6 +555,27 @@
       .controls { align-items: stretch; }
       .buttons, button { width: 100%; }
       .stage-header { flex-direction: column; align-items: flex-start; }
+
+      body.is-presenting .bracket-stage {
+        width: min(100vw - 24px, 720px);
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+      }
+
+      body.is-presenting .bracket-stage .matches {
+        grid-template-columns: 1fr;
+        padding: 18px;
+        gap: 18px;
+      }
+
+      body.is-presenting .bracket-stage .match-card {
+        height: auto;
+        min-height: 0;
+      }
+
+      body.is-presenting .bracket-stage .match-body {
+        height: auto;
+      }
     }
   </style>
 </head>
@@ -634,7 +749,7 @@
       if (cachedSrc) {
         return `
           <div class="flag" aria-hidden="true">
-            <img src="${escapeHtml(cachedSrc)}" alt="${escapeHtml(alt)}">
+            <img src="${escapeHtml(cachedSrc)}" alt="${escapeHtml(alt)}" data-flag-text="${escapeHtml(team.flagText)}" data-country="${escapeHtml(team.country)}" data-country-code="${escapeHtml(team.countryCode || '')}">
           </div>
         `;
       }
@@ -828,6 +943,7 @@
       }
 
       isGenerating = true;
+      exitPresentationMode(true);
       resetAll(false);
       generateBtn.disabled = true;
       resetBtn.disabled = true;
@@ -875,6 +991,9 @@
       generateBtn.disabled = false;
       resetBtn.disabled = false;
       exportBtn.disabled = false;
+
+      await wait(450);
+      enterPresentationMode();
     }
 
     function animatePickWithForcedResult(slotIndex, pool, finalTeam) {
@@ -907,6 +1026,7 @@
       rollingIntervals.forEach(clearInterval);
       rollingIntervals = [];
       isGenerating = false;
+      exitPresentationMode(true);
       selectedBySlot = Array(4).fill(null);
       currentMatches = [];
       renderTeamList();
@@ -943,6 +1063,7 @@
         exportClone.classList.add('export-capture');
         document.body.appendChild(exportClone);
 
+        prepareExportImages(exportClone);
         await waitForImages(exportClone);
         await wait(120);
 
@@ -957,7 +1078,7 @@
           windowHeight: exportHeight,
           backgroundColor: '#09070f',
           useCORS: true,
-          allowTaint: true,
+          allowTaint: false,
           logging: false,
           imageTimeout: 0,
           scrollX: 0,
@@ -982,6 +1103,185 @@
       }
     }
 
+
+    function prepareExportImages(root) {
+      // Si el HTML se abre con file://, html2canvas no puede exportar imágenes locales
+      // porque contaminan el canvas. En ese caso NO se usan emojis ni SVG como imagen:
+      // se reemplaza cada bandera del clon por una bandera construida con HTML/CSS,
+      // que sí puede capturarse sin taint y mantiene el aspecto visual de bandera.
+      if (window.location.protocol !== 'file:') return;
+
+      root.querySelectorAll('img[data-country-code]').forEach(img => {
+        const countryCode = img.getAttribute('data-country-code');
+        const flagText = img.getAttribute('data-flag-text') || '🏳️';
+        const exportFlag = createExportFlagElement(countryCode, flagText);
+        const flagWrapper = img.closest('.flag');
+
+        if (flagWrapper) {
+          flagWrapper.replaceWith(exportFlag);
+        } else {
+          img.replaceWith(exportFlag);
+        }
+      });
+    }
+
+    function createExportFlagElement(countryCode, flagText = '🏳️') {
+      const code = String(countryCode || '').toLowerCase();
+      const flag = document.createElement('div');
+      flag.className = 'flag export-css-flag';
+      flag.setAttribute('aria-hidden', 'true');
+
+      Object.assign(flag.style, {
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'rgba(255,255,255,0.08)',
+        boxShadow: 'inset 0 0 18px rgba(255,255,255,0.05)'
+      });
+
+      const add = (styles = {}, text = '') => {
+        const part = document.createElement('div');
+        part.textContent = text;
+        Object.assign(part.style, styles);
+        flag.appendChild(part);
+        return part;
+      };
+
+      const full = {
+        position: 'absolute',
+        inset: '0'
+      };
+
+      if (code === 'pe') {
+        add({ ...full, background: 'linear-gradient(90deg, #d91023 0 33.333%, #ffffff 33.333% 66.666%, #d91023 66.666% 100%)' });
+        return flag;
+      }
+
+      if (code === 'mx') {
+        add({ ...full, background: 'linear-gradient(90deg, #006847 0 33.333%, #ffffff 33.333% 66.666%, #ce1126 66.666% 100%)' });
+        add({
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          width: '22%',
+          height: '22%',
+          borderRadius: '50%',
+          background: '#b58b22',
+          border: '1px solid rgba(80,45,15,0.75)',
+          transform: 'translate(-50%, -50%)'
+        });
+        return flag;
+      }
+
+      if (code === 'ar') {
+        add({ ...full, background: 'linear-gradient(180deg, #74acdf 0 33.333%, #ffffff 33.333% 66.666%, #74acdf 66.666% 100%)' });
+        add({
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          width: '18%',
+          height: '18%',
+          borderRadius: '50%',
+          background: '#f6b40e',
+          transform: 'translate(-50%, -50%)'
+        });
+        return flag;
+      }
+
+      if (code === 'co') {
+        add({ ...full, background: 'linear-gradient(180deg, #fcd116 0 50%, #003893 50% 75%, #ce1126 75% 100%)' });
+        return flag;
+      }
+
+      if (code === 'ec') {
+        add({ ...full, background: 'linear-gradient(180deg, #fcd116 0 50%, #003893 50% 75%, #ce1126 75% 100%)' });
+        add({
+          position: 'absolute',
+          left: '50%',
+          top: '52%',
+          width: '18%',
+          height: '18%',
+          borderRadius: '50%',
+          background: '#b8860b',
+          border: '1px solid rgba(80,45,15,0.65)',
+          transform: 'translate(-50%, -50%)'
+        });
+        return flag;
+      }
+
+      if (code === 'bo') {
+        add({ ...full, background: 'linear-gradient(180deg, #d52b1e 0 33.333%, #f9e300 33.333% 66.666%, #007934 66.666% 100%)' });
+        add({
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          width: '16%',
+          height: '16%',
+          borderRadius: '50%',
+          background: '#8b5a2b',
+          transform: 'translate(-50%, -50%)'
+        });
+        return flag;
+      }
+
+      if (code === 'uy') {
+        add({ ...full, background: 'repeating-linear-gradient(180deg, #ffffff 0 11.11%, #0038a8 11.11% 22.22%)' });
+        add({
+          position: 'absolute',
+          left: '0',
+          top: '0',
+          width: '42%',
+          height: '55%',
+          background: '#ffffff'
+        });
+        add({
+          position: 'absolute',
+          left: '21%',
+          top: '27.5%',
+          width: '17%',
+          height: '17%',
+          borderRadius: '50%',
+          background: '#fcd116',
+          transform: 'translate(-50%, -50%)'
+        });
+        return flag;
+      }
+
+      if (code === 'cl') {
+        add({ ...full, background: 'linear-gradient(180deg, #ffffff 0 50%, #d52b1e 50% 100%)' });
+        add({
+          position: 'absolute',
+          left: '0',
+          top: '0',
+          width: '36%',
+          height: '50%',
+          background: '#0039a6'
+        });
+        add({
+          position: 'absolute',
+          left: '18%',
+          top: '25%',
+          width: '100%',
+          transform: 'translate(-50%, -50%)',
+          color: '#ffffff',
+          fontSize: '18px',
+          lineHeight: '1',
+          textAlign: 'center',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: '900'
+        }, '★');
+        return flag;
+      }
+
+      flag.textContent = flagText;
+      flag.classList.add('flag-fallback');
+      Object.assign(flag.style, {
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: '1.7rem'
+      });
+      return flag;
+    }
+
     function waitForImages(root) {
       const images = Array.from(root.querySelectorAll('img'));
       if (!images.length) return Promise.resolve();
@@ -998,6 +1298,110 @@
 
     function wait(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function getPresentationTargetWidth() {
+      return Math.min(1180, Math.max(320, window.innerWidth - 48));
+    }
+
+    function setPresentationGeometry() {
+      const captureArea = document.getElementById('captureArea');
+      if (!captureArea) return null;
+
+      const width = getPresentationTargetWidth();
+      captureArea.style.setProperty('--presentation-width', `${width}px`);
+      captureArea.style.setProperty('--presentation-left', '0px');
+      captureArea.style.setProperty('--presentation-top', '0px');
+
+      document.body.classList.add('is-presenting');
+      const measuredRect = captureArea.getBoundingClientRect();
+      const left = Math.max(12, (window.innerWidth - width) / 2);
+      const top = Math.max(12, (window.innerHeight - measuredRect.height) / 2);
+
+      captureArea.style.setProperty('--presentation-left', `${left}px`);
+      captureArea.style.setProperty('--presentation-top', `${top}px`);
+
+      return captureArea.getBoundingClientRect();
+    }
+
+    function enterPresentationMode() {
+      const captureArea = document.getElementById('captureArea');
+      if (!captureArea || document.body.classList.contains('is-presenting')) return;
+
+      const startRect = captureArea.getBoundingClientRect();
+      const endRect = setPresentationGeometry();
+      if (!endRect) return;
+
+      const scaleX = startRect.width / endRect.width;
+      const scaleY = startRect.height / endRect.height;
+      const translateX = startRect.left - endRect.left;
+      const translateY = startRect.top - endRect.top;
+
+      captureArea.animate([
+        {
+          transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
+          transformOrigin: 'top left'
+        },
+        {
+          transform: 'translate(0, 0) scale(1, 1)',
+          transformOrigin: 'top left'
+        }
+      ], {
+        duration: 620,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        fill: 'both'
+      }).onfinish = () => {
+        captureArea.getAnimations().forEach(animation => animation.cancel());
+      };
+    }
+
+    function exitPresentationMode(force = false) {
+      const captureArea = document.getElementById('captureArea');
+      if (!captureArea || !document.body.classList.contains('is-presenting')) return;
+
+      if (force) {
+        document.body.classList.remove('is-presenting', 'is-presentation-exiting');
+        captureArea.getAnimations().forEach(animation => animation.cancel());
+        captureArea.style.removeProperty('--presentation-width');
+        captureArea.style.removeProperty('--presentation-left');
+        captureArea.style.removeProperty('--presentation-top');
+        return;
+      }
+
+      const startRect = captureArea.getBoundingClientRect();
+      const previousVisibility = captureArea.style.visibility;
+
+      captureArea.style.visibility = 'hidden';
+      document.body.classList.remove('is-presenting');
+      const endRect = captureArea.getBoundingClientRect();
+      document.body.classList.add('is-presenting', 'is-presentation-exiting');
+      captureArea.style.visibility = previousVisibility;
+
+      const translateX = endRect.left - startRect.left;
+      const translateY = endRect.top - startRect.top;
+      const scaleX = endRect.width / startRect.width;
+      const scaleY = endRect.height / startRect.height;
+
+      captureArea.animate([
+        {
+          transform: 'translate(0, 0) scale(1, 1)',
+          transformOrigin: 'top left'
+        },
+        {
+          transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`,
+          transformOrigin: 'top left'
+        }
+      ], {
+        duration: 520,
+        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        fill: 'both'
+      }).onfinish = () => {
+        captureArea.getAnimations().forEach(animation => animation.cancel());
+        document.body.classList.remove('is-presenting', 'is-presentation-exiting');
+        captureArea.style.removeProperty('--presentation-width');
+        captureArea.style.removeProperty('--presentation-left');
+        captureArea.style.removeProperty('--presentation-top');
+      };
     }
 
     function escapeHtml(value) {
@@ -1021,6 +1425,11 @@
     generateBtn.addEventListener('click', generateMatchesAnimated);
     resetBtn.addEventListener('click', () => resetAll(true));
     exportBtn.addEventListener('click', exportImage);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        exitPresentationMode(false);
+      }
+    });
 
     initGenerator();
   </script>
